@@ -8,9 +8,17 @@
 	"icon": "media-document",
 	"description": "Block for password-protected page document sharing.",
 	"example": {},
+	"attributes": {
+    "categories": {
+        "type": "array",
+        "default": ["Candles", "Coffee", "Milk/Sugar", "Kitchen Roll", "Tea"]
+		}
+	},
 	"supports": {
+		"align": ["wide", "full"],
 		"html": false
 	},
+	"render": "file:./render.php",
 	"textdomain": "admin-doc-repo",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",

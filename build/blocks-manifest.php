@@ -13,9 +13,26 @@ return array(
 		'example' => array(
 			
 		),
+		'attributes' => array(
+			'categories' => array(
+				'type' => 'array',
+				'default' => array(
+					'Candles',
+					'Coffee',
+					'Milk/Sugar',
+					'Kitchen Roll',
+					'Tea'
+				)
+			)
+		),
 		'supports' => array(
+			'align' => array(
+				'wide',
+				'full'
+			),
 			'html' => false
 		),
+		'render' => 'file:./render.php',
 		'textdomain' => 'admin-doc-repo',
 		'editorScript' => 'file:./index.js',
 		'editorStyle' => 'file:./index.css',

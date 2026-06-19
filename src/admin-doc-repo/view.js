@@ -1,25 +1,33 @@
-/**
- * Use this file for JavaScript code that you want to run in the front-end
- * on posts/pages that contain this block.
- *
- * When this file is defined as the value of the `viewScript` property
- * in `block.json` it will be enqueued on the front end of the site.
- *
- * Example:
- *
- * ```js
- * {
- *   "viewScript": "file:./view.js"
- * }
- * ```
- *
- * If you're not making any changes to this file because your project doesn't need any
- * JavaScript running in the front-end, then you should delete this file and remove
- * the `viewScript` property from `block.json`.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script
- */
+import { render, useState, useEffect } from '@wordpress/element';
+import { createRoot } from "react-dom/client";
 
-/* eslint-disable no-console */
-console.log( 'Hello World! (from create-block-admin-doc-repo block)' );
-/* eslint-enable no-console */
+import FileManager from "./components/FileManager.jsx";
+import LoginForm from "./components/LoginForm.jsx";
+import {api} from "./utils/api.js";
+
+export default function App() {
+    const [authed, setAuthed] = useState(false);
+
+    useEffect(() => {
+        // Check if already authenticated via existing session
+        api.listFiles()
+            .then(() => setAuthed(true))
+            .catch(() => setAuthed(false));
+    }, []);
+
+    return (
+        <>
+            {authed
+                ? <FileManager api={api} />
+                : <LoginForm api={api}
+                    onLogin={() => setAuthed(true)} />
+            }
+        </>
+    );
+}
+
+// Mount
+const container = document.getElementById('sfm-app');
+if (container) {
+    createRoot(container).render(<App />);
+}

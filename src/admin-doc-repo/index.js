@@ -18,7 +18,6 @@ import './style.scss';
  * Internal dependencies
  */
 import Edit from './edit';
-import save from './save';
 import metadata from './block.json';
 
 /**
@@ -27,13 +26,10 @@ import metadata from './block.json';
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
 registerBlockType( metadata.name, {
-	/**
-	 * @see ./edit.js
-	 */
 	edit: Edit,
-
-	/**
-	 * @see ./save.js
-	 */
-	save,
-} );
+	//  () => <div style={{padding: '20px', background: '#f0f0f0', border: '1px solid #ccc'}}>
+	// 	Document Repository (frontend only)
+	// </div>,
+	
+	save: () => null,
+});
