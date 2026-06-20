@@ -20,15 +20,17 @@ export default function FileManager({api}: {api: ApiProps}) {
     const [sortDir, setSortDir]   = useState<string>('asc');
     const [filterCat, setFilter]  = useState<string>('');
     const [message, setMessage]   = useState<string>('');
-    const [error, setError]       = useState<string>('');
+    const [isError, setIsError]   = useState<boolean>(false);
     const [uploading, setUploading] = useState<boolean>(false);
 
     async function loadFiles() {
         try {
             const data = await api.listFiles();
             setFiles(data);
+            setMessage('');   // clear any stale message once data refreshes
         } catch (e: any) {
-            setError(e.message);
+            setIsError(true);
+            setMessage(e.message);
         }
     }
 
@@ -48,13 +50,15 @@ export default function FileManager({api}: {api: ApiProps}) {
         if (!file) return;
         setUploading(true);
         setMessage('');
-        setError('');
+        setIsError(false);
         try {
             const res = await api.upload(file);
+            await loadFiles();
+            setIsError(false);
             setMessage(`Uploaded: ${res.filename}`);
-            loadFiles();
         } catch (e: any) {
-            setError(e.message);
+            setIsError(true);
+            setMessage(e.message);
         } finally {
             setUploading(false);
             e.target.value = '';
@@ -77,8 +81,7 @@ export default function FileManager({api}: {api: ApiProps}) {
 
     return (
         <div>
-            {message && <p className="sfm-success">{message}</p>}
-            {error   && <p className="sfm-error">{error}</p>}
+            {message && <p className={isError ? "sfm-error" : "sfm-success"}>{message}</p>}
 
             <div className="sfm-toolbar">
                 <label className="sfm-upload-label">
@@ -130,10 +133,12 @@ export default function FileManager({api}: {api: ApiProps}) {
                     <tbody>
                         {sorted.map(file => (
                             <FileRow
-                                key={file.filename}
+                                key={file.uploaded}
                                 api={api}
                                 file={file}
                                 onChanged={loadFiles}
+                                setMessage={setMessage}
+                                setIsError={setIsError}
                             />
                         ))}
                     </tbody>

@@ -1,28 +1,39 @@
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
+import type { Dispatch, SetStateAction } from "react";
 
 import type { ApiProps } from '@block-root/types'
 
 interface FileRowProps {
     api: ApiProps,
     file: any,
-    onChanged: () => Promise<void>
+    onChanged: () => Promise<void>;
+    setMessage: Dispatch<SetStateAction<string>>;
+    setIsError: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function FileRow({ api, file, onChanged }: FileRowProps) {
+export default function FileRow({ api, file, onChanged, setMessage, setIsError }: FileRowProps) {
     const [editing, setEditing]   = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [category, setCategory] = useState(file.category);
     const [date, setDate]         = useState(file.date);
     const [newName, setNewName]   = useState(file.filename);
-    const [error, setError]       = useState('');
+
+    const [localMessage, setLocalMessage] = useState('');
+    const [localError, setLocalError]     = useState('');
+
+    useEffect(() => {
+        if (!localMessage) return;
+        const timer = setTimeout(() => setLocalMessage(''), 4000);
+        return () => clearTimeout(timer);
+    }, [localMessage]);
 
     async function saveMeta() {
         try {
             await api.saveMeta(file.filename, category, date);
             setEditing(false);
-            onChanged();
+            await onChanged();
         } catch (e: any) {
-            setError(e.message);
+            setLocalError(e.message);
         }
     }
 
@@ -30,32 +41,36 @@ export default function FileRow({ api, file, onChanged }: FileRowProps) {
         setCategory(file.category);
         setDate(file.date);
         setEditing(false);
-        setError('');
+        setLocalError('');
     }
 
     async function saveRename() {
         try {
             await api.rename(file.filename, newName);
             setRenaming(false);
-            onChanged();
+            await onChanged();
+            setLocalError('');
+            setLocalMessage(`Renamed ${file.filename}.`);
         } catch (e: any) {
-            setError(e.message);
+            setLocalError(e.message);
         }
     }
 
     function cancelRename() {
         setNewName(file.filename);
         setRenaming(false);
-        setError('');
+        setLocalError('');
     }
 
     async function handleDelete() {
         if (!confirm(`Delete ${file.filename}?`)) return;
         try {
             await api.delete(file.filename);
-            onChanged();
+            await onChanged();
+            setIsError(false);
+            setMessage(`Deleted: ${file.filename}`);
         } catch (e: any) {
-            setError(e.message);
+            setLocalError(e.message);
         }
     }
 
@@ -78,7 +93,8 @@ export default function FileRow({ api, file, onChanged }: FileRowProps) {
                 ) : (
                     <a href={file.url} download className="sfm-btn-link">{file.filename}</a>
                 )}
-                {error && <span className="sfm-error" style={{ display: 'block', marginTop: 4 }}>{error}</span>}
+                {localMessage && <span className="sfm-success" style={{ display: 'block', marginTop: 4 }}>{localMessage}</span>}
+                {localError && <span className="sfm-error" style={{ display: 'block', marginTop: 4 }}>{localError}</span>}
             </td>
             <td>
                 {editing ? (
