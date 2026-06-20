@@ -165,6 +165,7 @@ function sfm_api_list_files() {
             'url'      => SFM_UPLOAD_URL . $basename,
             'category' => $meta['category'] ?? '',
             'date'     => $meta['date'] ?? '',
+			'amount'   => $meta['amount'] ?? '',
         ];
     }
     return rest_ensure_response($result);
@@ -237,12 +238,13 @@ function sfm_api_save_meta(WP_REST_Request $request) {
     $filename = sanitize_file_name($request->get_param('filename'));
     $category = sanitize_text_field($request->get_param('category') ?? '');
     $date     = sanitize_text_field($request->get_param('date') ?? '');
+	$amount   = sanitize_text_field($request->get_param('amount') ?? '');
 
     if (!file_exists(SFM_UPLOAD_DIR . $filename)) {
         return new WP_Error('not_found', 'File not found', ['status' => 404]);
     }
 
-    sfm_save_meta($filename, ['category' => $category, 'date' => $date]);
+    sfm_save_meta($filename, ['category' => $category, 'date' => $date, 'amount' => $amount]);
     return rest_ensure_response(['success' => true]);
 }
 

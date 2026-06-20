@@ -17,11 +17,15 @@ import type { ApiProps, SfmFile, UploadResponse } from '@block-root/types';
 export default function FileManager({api}: {api: ApiProps}) {
     const [files, setFiles]       = useState<SfmFile[]>([]);
     const [sortBy, setSortBy]     = useState<keyof SfmFile>('filename');
-    const [sortDir, setSortDir]   = useState<string>('asc');
+    const [sortAsc, setSortAsc]   = useState<boolean>(true);
     const [filterCat, setFilter]  = useState<string>('');
     const [message, setMessage]   = useState<string>('');
     const [isError, setIsError]   = useState<boolean>(false);
     const [uploading, setUploading] = useState<boolean>(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [category, setCategory] = useState('');
+    const [date, setDate]         = useState('');
+    const [amount, setAmount] = useState('');
 
     async function loadFiles() {
         try {
@@ -38,31 +42,43 @@ export default function FileManager({api}: {api: ApiProps}) {
 
     function handleSort(col: keyof SfmFile) {
         if (sortBy === col) {
-            setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+            setSortAsc(prev => !prev);
         } else {
             setSortBy(col);
-            setSortDir('asc');
+            setSortAsc(true);
         }
     }
 
-    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
-        if (!file) return;
+        setSelectedFile(file ?? null);
+    }
+
+    async function handleUpload() {
+        if (!selectedFile) return;
         setUploading(true);
         setMessage('');
         setIsError(false);
         try {
-            const res = await api.upload(file);
+            const res = await api.upload(selectedFile);
+            await api.saveMeta(res.filename, category, date, amount);
             await loadFiles();
             setIsError(false);
             setMessage(`Uploaded: ${res.filename}`);
+            setSelectedFile(null);
         } catch (e: any) {
             setIsError(true);
             setMessage(e.message);
         } finally {
             setUploading(false);
-            e.target.value = '';
         }
+    }
+
+    function clearUpload() {
+        setSelectedFile(null);
+        setCategory('');
+        setDate('');
+        setAmount('');
     }
 
     async function handleLogout() {
@@ -75,19 +91,14 @@ export default function FileManager({api}: {api: ApiProps}) {
         .sort((a, b) => {
             const av = a[sortBy] ?? '';
             const bv = b[sortBy] ?? '';
-            const dir = sortDir === 'asc' ? 1 : -1;
+            const dir = sortAsc === true ? 1 : -1;
             return av > bv ? dir : av < bv ? -dir : 0;
         });
 
     return (
         <div>
             {message && <p className={isError ? "sfm-error" : "sfm-success"}>{message}</p>}
-
             <div className="sfm-toolbar">
-                <label className="sfm-upload-label">
-                    {uploading ? '↑ Uploading...' : '↑ Upload File'}
-                    <input type="file" onChange={handleUpload} disabled={uploading} />
-                </label>
 
                 <select
                     className="sfm-select"
@@ -102,7 +113,73 @@ export default function FileManager({api}: {api: ApiProps}) {
                     <button className="sfm-logout" onClick={handleLogout}>Log out</button>
                 </div>
             </div>
+            <div className="sfm-upload-group">
+                <div className="sfm-upload-input-group">
+                    <div className="sfm-upload-input">
+                        <span>File</span>
+                        
+                        <label className="sfm-upload-label">
+                            Browse
+                            <input type="file" onChange={handleFileSelect} disabled={uploading} />
+                        </label>
+                    </div>
+                    {selectedFile && (
+                        <div className="sfm-upload-input">
+                            <span>File name</span>
+                            <div className="sfm-selected-filename">{selectedFile.name}</div>
+                        </div>
+                    )}
+                        
+                    <div className="sfm-upload-input">
+                        <span>Category</span> 
+                        <select
+                            className="sfm-inline-select"
+                            value={category}
+                            onChange={e => setCategory(e.target.value)}
+                        >
+                            <option value="">— None —</option>
+                            {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    <div className="sfm-upload-input">
+                        <span>Date</span> 
+                        <input
+                            type="date"
+                            className="sfm-date-input"
+                            value={date}
+                            onChange={e => setDate(e.target.value)}
+                        />
+                    </div>
+                    <div className="sfm-upload-input">
+                    <span>Amount</span> 
+                        <input
+                            type="number"
+                            step="0.01"
+                            size={6}
+                            className="sfm-amount-input"
+                            value={amount}
+                            onChange={e => setAmount(e.target.value)}
+                        />
+                    </div>
+                </div>
+                <div className="sfm-toolbar-right">
+                    {selectedFile && (
+                        <button
+                            className="sfm-btn sfm-btn-primary"
+                            onClick={handleUpload}
+                            disabled={!selectedFile || uploading}
+                        >
+                            {uploading ? 'Uploading...' : 'Upload'}
+                        </button>
+                    )}
 
+                    {selectedFile && !uploading && (
+                        <button className="sfm-btn" onClick={clearUpload}>
+                            Clear
+                        </button>
+                    )}
+                </div>
+            </div>
             {sorted.length === 0 ? (
                 <div className="sfm-empty">
                     {files.length === 0 ? 'No files uploaded yet.' : 'No files match the selected category.'}
@@ -115,6 +192,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                                 { col: 'filename', label: 'Filename' },
                                 { col: 'category', label: 'Category' },
                                 { col: 'date',     label: 'Date' },
+                                { col: 'amount', label: 'Amount' },
                                 { col: 'size',     label: 'Size' },
                                 { col: 'uploaded', label: 'Uploaded' },
                             ] as { col: keyof SfmFile; label: string }[]).map(({ col, label }) => (
@@ -124,7 +202,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                                     onClick={() => handleSort(col)}
                                 >
                                     {label}
-                                    <SortIcon col={col} sortBy={sortBy} sortDir={sortDir} />
+                                    <SortIcon col={col} sortBy={sortBy} sortAsc={sortAsc} />
                                 </th>
                             ))}
                             <th>Actions</th>

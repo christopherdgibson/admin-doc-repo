@@ -52,6 +52,38 @@
 	gap: 12px;
 }
 
+.sfm-upload-group {
+    display: flex;
+	margin-bottom: 20px;
+}
+
+.sfm-upload-input-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 8px;
+}
+
+.sfm-upload-input {
+    display: contents;
+}
+
+.sfm-upload-input span {
+    grid-row: 1;
+	padding-left: 4px;
+}
+
+.sfm-upload-input > *:not(span) {
+    grid-row: 2;
+}
+
+.sfm-selected-filename {
+    font-size: 13px;
+    color: #555;
+}
+
 .sfm-upload-label {
 	display: inline-flex;
 	align-items: center;
@@ -175,11 +207,17 @@ table.sfm-table {
 	background: #fff;
 }
 
+.sfm-amount-input,
 .sfm-date-input {
 	padding: 5px 8px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	font-size: 13px;
+}
+
+.sfm-amount-input {
+	width: fit-content;
+	min-width: 4em;
 }
 
 .sfm-empty {

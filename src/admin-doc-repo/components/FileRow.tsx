@@ -16,6 +16,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     const [renaming, setRenaming] = useState(false);
     const [category, setCategory] = useState(file.category);
     const [date, setDate]         = useState(file.date);
+    const [amount, setAmount] = useState(file.amount);
     const [newName, setNewName]   = useState(file.filename);
 
     const [localMessage, setLocalMessage] = useState('');
@@ -29,7 +30,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     async function saveMeta() {
         try {
-            await api.saveMeta(file.filename, category, date);
+            await api.saveMeta(file.filename, category, date, amount);
             setEditing(false);
             await onChanged();
         } catch (e: any) {
@@ -40,6 +41,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     function cancelEdit() {
         setCategory(file.category);
         setDate(file.date);
+        setAmount(file.Amount);
         setEditing(false);
         setLocalError('');
     }
@@ -120,6 +122,20 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                     />
                 ) : (
                     file.date || <span style={{ color: '#aaa' }}>—</span>
+                )}
+            </td>
+            <td>
+                {editing ? (
+                    <input
+                        type="number"
+                        step="0.01"
+                        size={6}
+                        className="sfm-amount-input"
+                        value={amount}
+                        onChange={e => setAmount(e.target.value)}
+                    />
+                ) : (
+                    file.amount || <span style={{ color: '#aaa' }}>—</span>
                 )}
             </td>
             <td style={{ color: '#888' }}>{sizeLabel}</td>

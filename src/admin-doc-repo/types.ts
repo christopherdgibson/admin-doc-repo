@@ -28,9 +28,8 @@ export interface ApiProps {
     upload: (file: File) => Promise<UploadResponse>;
     delete: (filename: string) => Promise<ApiResponse>;
     rename: (old_filename: string, new_filename: string) => Promise<ApiResponse>;
-    saveMeta: (filename: string, category: string, date: string) => Promise<ApiResponse>;
+    saveMeta: (filename: string, category: string, date: string, amount: string) => Promise<ApiResponse>;
 }
-
 
 export interface BlockAttributes {
     align: string;

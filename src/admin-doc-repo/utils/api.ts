@@ -40,9 +40,9 @@ export const api = {
         body: JSON.stringify({ old_filename, new_filename }),
     }),
 
-    saveMeta: (filename: string, category: string, date: string) => api.call('/meta', {
+    saveMeta: (filename: string, category: string, date: string, amount: string) => api.call('/meta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, category, date }),
+        body: JSON.stringify({ filename, category, date, amount }),
     }),
 };
