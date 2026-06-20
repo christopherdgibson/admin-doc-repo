@@ -175,6 +175,11 @@ function sfm_api_upload(WP_REST_Request $request) {
     }
 
     $filename = sanitize_file_name($file['name']);
+
+    if (file_exists(SFM_UPLOAD_DIR . $filename)) {
+        return new WP_Error('name_taken', 'A file with that name already exists. Rename or delete it first.', ['status' => 409]);
+    }
+
     if (move_uploaded_file($file['tmp_name'], SFM_UPLOAD_DIR . $filename)) {
         return rest_ensure_response(['success' => true, 'filename' => $filename]);
     }

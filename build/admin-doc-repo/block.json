@@ -9,6 +9,10 @@
   "description": "Block for password-protected page document sharing.",
   "example": {},
   "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
     "categories": {
       "type": "array",
       "default": [

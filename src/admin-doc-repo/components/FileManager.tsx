@@ -1,29 +1,40 @@
 import { useState, useEffect } from '@wordpress/element';
 
-import FileRow from "./FileRow.jsx";
-import SortIcon from "./SortIcon.jsx";
+import type { Dispatch, SetStateAction } from "react";
 
-export default function FileManager({api}) {
-    const [files, setFiles]       = useState([]);
-    const [sortBy, setSortBy]     = useState('filename');
-    const [sortDir, setSortDir]   = useState('asc');
-    const [filterCat, setFilter]  = useState('');
-    const [message, setMessage]   = useState('');
-    const [error, setError]       = useState('');
-    const [uploading, setUploading] = useState(false);
+import FileRow from "@components/FileRow";
+import SortIcon from "@components/SortIcon";
+
+import type { ApiProps, SfmFile, UploadResponse } from '@block-root/types';
+
+// setActiveTab: Dispatch<SetStateAction<string>>;
+// / select onChange
+// (e: React.ChangeEvent<HTMLSelectElement>)
+
+// // button onClick
+// (e: React.MouseEvent<HTMLButtonElement>)
+
+export default function FileManager({api}: {api: ApiProps}) {
+    const [files, setFiles]       = useState<SfmFile[]>([]);
+    const [sortBy, setSortBy]     = useState<keyof SfmFile>('filename');
+    const [sortDir, setSortDir]   = useState<string>('asc');
+    const [filterCat, setFilter]  = useState<string>('');
+    const [message, setMessage]   = useState<string>('');
+    const [error, setError]       = useState<string>('');
+    const [uploading, setUploading] = useState<boolean>(false);
 
     async function loadFiles() {
         try {
             const data = await api.listFiles();
             setFiles(data);
-        } catch (e) {
+        } catch (e: any) {
             setError(e.message);
         }
     }
 
     useEffect(() => { loadFiles(); }, []);
 
-    function handleSort(col) {
+    function handleSort(col: keyof SfmFile) {
         if (sortBy === col) {
             setSortDir(d => d === 'asc' ? 'desc' : 'asc');
         } else {
@@ -32,8 +43,8 @@ export default function FileManager({api}) {
         }
     }
 
-    async function handleUpload(e) {
-        const file = e.target.files[0];
+    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
         if (!file) return;
         setUploading(true);
         setMessage('');
@@ -42,7 +53,7 @@ export default function FileManager({api}) {
             const res = await api.upload(file);
             setMessage(`Uploaded: ${res.filename}`);
             loadFiles();
-        } catch (e) {
+        } catch (e: any) {
             setError(e.message);
         } finally {
             setUploading(false);
@@ -81,7 +92,7 @@ export default function FileManager({api}) {
                     onChange={e => setFilter(e.target.value)}
                 >
                     <option value="">All categories</option>
-                    {SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
+                    {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
 
                 <div className="sfm-toolbar-right">
@@ -97,13 +108,13 @@ export default function FileManager({api}) {
                 <table className="sfm-table">
                     <thead>
                         <tr>
-                            {[
+                            {([
                                 { col: 'filename', label: 'Filename' },
                                 { col: 'category', label: 'Category' },
                                 { col: 'date',     label: 'Date' },
                                 { col: 'size',     label: 'Size' },
                                 { col: 'uploaded', label: 'Uploaded' },
-                            ].map(({ col, label }) => (
+                            ] as { col: keyof SfmFile; label: string }[]).map(({ col, label }) => (
                                 <th
                                     key={col}
                                     className="sortable"

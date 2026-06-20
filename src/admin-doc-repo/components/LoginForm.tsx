@@ -1,11 +1,18 @@
 import { useState } from '@wordpress/element';
 
-export default function LoginForm({ api, onLogin }) {
+import type { ApiProps } from '@block-root/types';
+
+interface LoginFormProps {
+    api: ApiProps;
+    onLogin: () => void;
+}
+
+export default function LoginForm({ api, onLogin }: LoginFormProps) {
     const [password, setPassword] = useState('');
     const [error, setError]       = useState('');
     const [loading, setLoading]   = useState(false);
 
-    async function handleSubmit(e) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
         setError('');

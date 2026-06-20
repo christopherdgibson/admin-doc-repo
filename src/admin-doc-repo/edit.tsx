@@ -2,7 +2,9 @@ import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-export default function Edit({ attributes, setAttributes }) {
+import type { EditProps } from '@block-root/types';
+
+export default function Edit({ attributes, setAttributes }: EditProps) {
     const { categories } = attributes;
     const [newCategory, setNewCategory] = useState('');
 
@@ -13,7 +15,7 @@ export default function Edit({ attributes, setAttributes }) {
         }
     }
 
-    function removeCategory(index) {
+    function removeCategory(index: number) {
         setAttributes({ categories: categories.filter((_, i) => i !== index) });
     }
 

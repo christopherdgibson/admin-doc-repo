@@ -25,8 +25,8 @@ import metadata from './block.json';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
-registerBlockType( metadata.name, {
-	edit: Edit,
+registerBlockType( metadata.name as any, {
+	edit: Edit as any,
 	//  () => <div style={{padding: '20px', background: '#f0f0f0', border: '1px solid #ccc'}}>
 	// 	Document Repository (frontend only)
 	// </div>,

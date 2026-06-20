@@ -14,6 +14,10 @@ return array(
 			
 		),
 		'attributes' => array(
+			'align' => array(
+				'type' => 'string',
+				'default' => 'wide'
+			),
 			'categories' => array(
 				'type' => 'array',
 				'default' => array(

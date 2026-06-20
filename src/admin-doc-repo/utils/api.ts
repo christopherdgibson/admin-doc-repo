@@ -1,10 +1,10 @@
 export const api = {
-    async call(endpoint, options = {}) {
-        const res = await fetch(`${SFM.apiBase}${endpoint}`, {
+    async call(endpoint: string, options: RequestInit = {}) {
+        const res = await fetch(`${window.SFM.apiBase}${endpoint}`, {
             ...options,
             headers: {
-                'X-WP-Nonce': SFM.nonce,
-                ...options.headers,
+                'X-WP-Nonce': window.SFM.nonce,
+                ...(options.headers as Record<string, string>),
             },
         });
         const data = await res.json();
@@ -12,7 +12,7 @@ export const api = {
         return data;
     },
 
-    login: (password) => api.call('/login', {
+    login: (password: string) => api.call('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -22,25 +22,25 @@ export const api = {
 
     listFiles: () => api.call('/files'),
 
-    upload: (file) => {
+    upload: (file: File) => {
         const form = new FormData();
         form.append('sfm_file', file);
         return api.call('/upload', { method: 'POST', body: form });
     },
 
-    delete: (filename) => api.call('/delete', {
+    delete: (filename: string) => api.call('/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename }),
     }),
 
-    rename: (old_filename, new_filename) => api.call('/rename', {
+    rename: (old_filename: string, new_filename: string) => api.call('/rename', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ old_filename, new_filename }),
     }),
 
-    saveMeta: (filename, category, date) => api.call('/meta', {
+    saveMeta: (filename: string, category: string, date: string) => api.call('/meta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename, category, date }),

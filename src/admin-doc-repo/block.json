@@ -9,9 +9,13 @@
 	"description": "Block for password-protected page document sharing.",
 	"example": {},
 	"attributes": {
-    "categories": {
-        "type": "array",
-        "default": ["Candles", "Coffee", "Milk/Sugar", "Kitchen Roll", "Tea"]
+		"align": {
+			"type": "string",
+			"default": "wide"
+    	},
+    	"categories": {
+			"type": "array",
+			"default": ["Candles", "Coffee", "Milk/Sugar", "Kitchen Roll", "Tea"]
 		}
 	},
 	"supports": {

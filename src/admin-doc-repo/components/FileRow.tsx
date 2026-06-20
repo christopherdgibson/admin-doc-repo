@@ -1,6 +1,14 @@
 import { useState } from '@wordpress/element';
 
-export default function FileRow({ api, file, onChanged }) {
+import type { ApiProps } from '@block-root/types'
+
+interface FileRowProps {
+    api: ApiProps,
+    file: any,
+    onChanged: () => Promise<void>
+}
+
+export default function FileRow({ api, file, onChanged }: FileRowProps) {
     const [editing, setEditing]   = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [category, setCategory] = useState(file.category);
@@ -13,7 +21,7 @@ export default function FileRow({ api, file, onChanged }) {
             await api.saveMeta(file.filename, category, date);
             setEditing(false);
             onChanged();
-        } catch (e) {
+        } catch (e: any) {
             setError(e.message);
         }
     }
@@ -30,7 +38,7 @@ export default function FileRow({ api, file, onChanged }) {
             await api.rename(file.filename, newName);
             setRenaming(false);
             onChanged();
-        } catch (e) {
+        } catch (e: any) {
             setError(e.message);
         }
     }
@@ -46,7 +54,7 @@ export default function FileRow({ api, file, onChanged }) {
         try {
             await api.delete(file.filename);
             onChanged();
-        } catch (e) {
+        } catch (e: any) {
             setError(e.message);
         }
     }
@@ -80,7 +88,7 @@ export default function FileRow({ api, file, onChanged }) {
                         onChange={e => setCategory(e.target.value)}
                     >
                         <option value="">— None —</option>
-                        {SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 ) : (
                     file.category || <span style={{ color: '#aaa' }}>—</span>

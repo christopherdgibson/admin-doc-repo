@@ -1,9 +1,9 @@
-import { render, useState, useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { createRoot } from "react-dom/client";
 
-import FileManager from "./components/FileManager.jsx";
-import LoginForm from "./components/LoginForm.jsx";
-import {api} from "./utils/api.js";
+import FileManager from "@components/FileManager";
+import LoginForm from "@components/LoginForm";
+import {api} from "@admin-doc-repo/utils/api";
 
 export default function App() {
     const [authed, setAuthed] = useState(false);
