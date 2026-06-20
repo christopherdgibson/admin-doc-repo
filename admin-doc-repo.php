@@ -21,7 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // ── Constants ────────────────────────────────────────────────
 
-define('SFM_PASSWORD', password_hash('your-password-here', PASSWORD_DEFAULT));
 define('SFM_UPLOAD_DIR', WP_CONTENT_DIR . '/sfm-files/');
 define('SFM_UPLOAD_URL', WP_CONTENT_URL . '/sfm-files/');
 
@@ -126,10 +125,20 @@ function sfm_api_check_auth() {
     return !empty($_SESSION['sfm_authed']);
 }
 
+function sfm_get_password_hash() {
+    return get_option('sfm_password_hash', '');
+}
+
 function sfm_api_login(WP_REST_Request $request) {
     if (!session_id()) session_start();
+
+    $hash = sfm_get_password_hash();
+    if (empty($hash)) {
+        return new WP_Error('not_configured', 'No password has been set by the administrator.', ['status' => 503]);
+    }
+
     $password = $request->get_param('password');
-    if (password_verify($password, SFM_PASSWORD)) {
+    if (password_verify($password, $hash)) {
         $_SESSION['sfm_authed'] = true;
         return rest_ensure_response(['success' => true]);
     }
@@ -242,10 +251,16 @@ function sfm_api_save_meta(WP_REST_Request $request) {
 function sfm_handle_actions() {
     if (!session_id()) session_start();
 
-    $result = ['error' => '', 'message' => '', 'renaming' => ''];
+	$result = ['error' => '', 'message' => '', 'renaming' => ''];
+
+    $hash = sfm_get_password_hash();
+    if (empty($hash)) {
+        $result['error'] = 'No password has been set by the administrator. Go to Settings → Doc Repo to set one.';
+        return $result;
+    }
 
     if (isset($_POST['sfm_password'])) {
-        if (password_verify($_POST['sfm_password'], SFM_PASSWORD)) {
+        if (password_verify($_POST['sfm_password'], $hash)) {
             $_SESSION['sfm_authed'] = true;
         } else {
             $result['error'] = 'Incorrect password.';
@@ -387,12 +402,81 @@ function sfm_render_page() {
 
     $result     = sfm_handle_actions();
     $logout_url = admin_url('admin.php?page=sfm-files&sfm_logout=1');
+    $is_configured = (bool) sfm_get_password_hash();
+    $settings_url  = admin_url('options-general.php?page=sfm-settings');
 
     echo '<div class="wrap"><h1>File Manager</h1>';
+
+    if ($is_configured) {
+        echo '<p style="color:#2271b1;">✓ Password is configured. <a href="' . esc_url($settings_url) . '">Change it</a></p>';
+    } else {
+        echo '<p style="color:#c0392b;">✗ No password set. <a href="' . esc_url($settings_url) . '">Set one now</a></p>';
+    }
+
     if (empty($_SESSION['sfm_authed'])) {
         echo sfm_render_login_form($result['error']);
     } else {
         echo sfm_render_file_manager($result['message'], $result['error'], $result['renaming'], $logout_url);
     }
     echo '</div>';
+}
+
+// ── Settings Page ────────────────────────────────────────────
+
+function sfm_settings_menu() {
+    add_options_page(
+        'Admin Doc Repo Settings',
+        'Doc Repo',
+        'manage_options',
+        'sfm-settings',
+        'sfm_render_settings_page'
+    );
+}
+add_action('admin_menu', 'sfm_settings_menu');
+
+function sfm_render_settings_page() {
+    if (!current_user_can('manage_options')) return;
+
+    $message = '';
+
+    if (isset($_POST['sfm_new_password']) && check_admin_referer('sfm_settings_save')) {
+        $new_password = $_POST['sfm_new_password'];
+        if (!empty($new_password)) {
+            update_option('sfm_password_hash', password_hash($new_password, PASSWORD_DEFAULT));
+            $message = 'Password updated.';
+        }
+    }
+
+    $is_configured = (bool) get_option('sfm_password_hash');
+    ?>
+    <div class="wrap">
+        <h1>Admin Doc Repo Settings</h1>
+
+        <?php if ($message): ?>
+            <div class="notice notice-success"><p><?= esc_html($message) ?></p></div>
+        <?php endif; ?>
+
+        <?php if (!$is_configured): ?>
+            <div class="notice notice-warning">
+                <p>No password is set. The document repository will not allow access until you set one.</p>
+            </div>
+        <?php endif; ?>
+
+        <form method="post">
+            <?php wp_nonce_field('sfm_settings_save'); ?>
+            <table class="form-table">
+                <tr>
+                    <th><label for="sfm_new_password">
+                        <?= $is_configured ? 'Change Password' : 'Set Password' ?>
+                    </label></th>
+                    <td>
+                        <input type="password" id="sfm_new_password" name="sfm_new_password" class="regular-text" autocomplete="new-password">
+                        <p class="description">Visitors will need this password to access the document repository.</p>
+                    </td>
+                </tr>
+            </table>
+            <?php submit_button($is_configured ? 'Update Password' : 'Set Password'); ?>
+        </form>
+    </div>
+    <?php
 }
