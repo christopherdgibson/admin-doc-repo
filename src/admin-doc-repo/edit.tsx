@@ -1,34 +1,31 @@
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, TextControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import type { Dispatch, SetStateAction } from "react";
 
-import type { EditProps } from '@block-root/types';
+import type { BlockAttributes, EditProps } from '@block-root/types';
 
 export default function Edit({ attributes, setAttributes }: EditProps) {
     const { categories, submissions } = attributes;
     const [newCategory, setNewCategory] = useState('');
     const [newSubmittedBy, setNewSubmittedBy] = useState('');
 
-    function addCategory() {
-        if (newCategory.trim()) {
-            setAttributes({ categories: [...categories, newCategory.trim()] });
-            setNewCategory('');
+    type ArrayKeys<T> = {
+        [K in keyof T]: T[K] extends any[] ? K : never;
+    }[keyof T];
+
+    function addOption(attribute: ArrayKeys<BlockAttributes>, newOption: string, setNewOption: Dispatch<SetStateAction<string>>) {
+        if (newOption.trim()) {
+            const options = attributes[attribute] as string[];
+            const newOptions = [...options, newOption.trim()];
+            setAttributes({ [attribute]: newOptions } as Partial<BlockAttributes>);
+            setNewOption('');
         }
     }
 
-    function addSubmittedBy() {
-        if (newSubmittedBy.trim()) {
-            setAttributes({ submissions: [...submissions, newSubmittedBy.trim()] });
-            setNewSubmittedBy('');
-        }
-    }
-
-    function removeCategory(index: number) {
-        setAttributes({ categories: categories.filter((_, i) => i !== index) });
-    }
-
-    function removeSubmittedBy(index: number) {
-        setAttributes({ submissions: submissions.filter((_, i) => i !== index) });
+    function removeOption(attribute: ArrayKeys<BlockAttributes>, index: number) {
+        const options = attributes[attribute] as string[];
+        setAttributes({ [attribute]: options.filter((_, i) => i !== index) } as Partial<BlockAttributes>);
     }
 
     return (
@@ -38,7 +35,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                     {categories.map((cat, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                             <span>{cat}</span>
-                            <Button isDestructive isSmall onClick={() => removeCategory(i)}>Remove</Button>
+                            <Button isDestructive isSmall onClick={() => removeOption('categories', i)}>Remove</Button>
                         </div>
                     ))}
                     <TextControl
@@ -46,13 +43,13 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                         value={newCategory}
                         onChange={setNewCategory}
                     />
-                    <Button isPrimary onClick={addCategory}>Add</Button>
+                    <Button isPrimary onClick={() => addOption('categories', newCategory, setNewCategory)}>Add</Button>
                 </PanelBody>
                 <PanelBody title="Submitted By">
                     {submissions.map((sub, i) => (
                         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                             <span>{sub}</span>
-                            <Button isDestructive isSmall onClick={() => removeSubmittedBy(i)}>Remove</Button>
+                            <Button isDestructive isSmall onClick={() => removeOption('submissions', i)}>Remove</Button>
                         </div>
                     ))}
                     <TextControl
@@ -60,7 +57,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                         value={newSubmittedBy}
                         onChange={setNewSubmittedBy}
                     />
-                    <Button isPrimary onClick={addSubmittedBy}>Add</Button>
+                    <Button isPrimary onClick={() => addOption('submissions', newSubmittedBy, setNewSubmittedBy)}>Add</Button>
                 </PanelBody>
             </InspectorControls>
 

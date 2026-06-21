@@ -237,16 +237,21 @@ function sfm_api_rename(WP_REST_Request $request) {
 
 function sfm_api_save_meta(WP_REST_Request $request) {
     $filename = sanitize_file_name($request->get_param('filename'));
-    $category = sanitize_text_field($request->get_param('category') ?? '');
-    $submittedBy = sanitize_text_field($request->get_param('submittedBy') ?? '');
-    $date     = sanitize_text_field($request->get_param('date') ?? '');
-	$amount   = sanitize_text_field($request->get_param('amount') ?? '');
+    $filename = sanitize_file_name($request->get_param('filename'));
+    $meta_input = $request->get_param('meta') ?? [];
+
+    $meta = [
+        'category'     => sanitize_text_field($meta_input['category'] ?? ''),
+        'submittedBy'  => sanitize_text_field($meta_input['submittedBy'] ?? ''),
+        'date'         => sanitize_text_field($meta_input['date'] ?? ''),
+        'amount'       => sanitize_text_field($meta_input['amount'] ?? ''),
+    ];
 
     if (!file_exists(SFM_UPLOAD_DIR . $filename)) {
         return new WP_Error('not_found', 'File not found', ['status' => 404]);
     }
 
-    sfm_save_meta($filename, ['category' => $category, 'submittedBy' => $submittedBy, 'date' => $date, 'amount' => $amount]);
+    sfm_save_meta($filename, $meta);
     return rest_ensure_response(['success' => true]);
 }
 

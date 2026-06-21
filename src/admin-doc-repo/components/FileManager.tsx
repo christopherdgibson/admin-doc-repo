@@ -1,18 +1,9 @@
 import { useState, useEffect } from '@wordpress/element';
 
-import type { Dispatch, SetStateAction } from "react";
-
 import FileRow from "@components/FileRow";
 import SortIcon from "@components/SortIcon";
 
-import type { ApiProps, SfmFile, UploadResponse } from '@block-root/types';
-
-// setActiveTab: Dispatch<SetStateAction<string>>;
-// / select onChange
-// (e: React.ChangeEvent<HTMLSelectElement>)
-
-// // button onClick
-// (e: React.MouseEvent<HTMLButtonElement>)
+import type { ApiProps, SfmFile } from '@block-root/types';
 
 export default function FileManager({api}: {api: ApiProps}) {
     const [files, setFiles]       = useState<SfmFile[]>([]);
@@ -62,7 +53,7 @@ export default function FileManager({api}: {api: ApiProps}) {
         setIsError(false);
         try {
             const res = await api.upload(selectedFile);
-            await api.saveMeta(res.filename, category, submittedBy, date, amount);
+            await api.saveMeta(res.filename, {category, submittedBy, date, amount});
             await loadFiles();
             setIsError(false);
             setMessage(`Uploaded: ${res.filename}`);

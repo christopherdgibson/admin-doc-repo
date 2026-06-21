@@ -32,7 +32,7 @@ export interface ApiProps {
     upload: (file: File) => Promise<UploadResponse>;
     delete: (filename: string) => Promise<ApiResponse>;
     rename: (old_filename: string, new_filename: string) => Promise<ApiResponse>;
-    saveMeta: (filename: string, category: string, submittedBy: string, date: string, amount: string) => Promise<ApiResponse>;
+    saveMeta: (filename: string, meta: SfmMeta) => Promise<ApiResponse>;
 }
 
 export interface BlockAttributes {
@@ -49,24 +49,13 @@ export interface EditProps extends SetAttributesProps {
     attributes: BlockAttributes;
 }
 
-// interface EditButtonsProps<T = void> {
-//     onClickDelete: (arg?: T) => void;
-//     onClickSplit: () => void;
-//     isSubMeeting: boolean;
-// }
-
-export interface SelectedCard {
-    index: number | null;
-    subIndex: number | null;
-}
-
 export type OnClick = () => void;
 
 export type OnChange = (value: string) => void;
 
-export interface ThemeStyles extends React.CSSProperties {
-    "--base-bg"?: string;
-    "--font-selected"?: string;
-    "--accent-primary"?: string;
-    "--accent-secondary"?: string;
-}
+
+// // select onChange
+// (e: React.ChangeEvent<HTMLSelectElement>)
+
+// // button onClick
+// (e: React.MouseEvent<HTMLButtonElement>)

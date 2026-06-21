@@ -1,3 +1,5 @@
+import type { SfmMeta } from '@block-root/types'
+
 export const api = {
     async call(endpoint: string, options: RequestInit = {}) {
         const res = await fetch(`${window.SFM.apiBase}${endpoint}`, {
@@ -40,9 +42,9 @@ export const api = {
         body: JSON.stringify({ old_filename, new_filename }),
     }),
 
-    saveMeta: (filename: string, category: string, submittedBy: string, date: string, amount: string) => api.call('/meta', {
+    saveMeta: (filename: string, meta: SfmMeta) => api.call('/meta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, category, submittedBy, date, amount }),
+        body: JSON.stringify({filename, meta}),
     }),
 };

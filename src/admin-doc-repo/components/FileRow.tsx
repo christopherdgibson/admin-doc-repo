@@ -31,7 +31,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     async function saveMeta() {
         try {
-            await api.saveMeta(file.filename, category, submittedBy, date, amount);
+            await api.saveMeta(file.filename, {category, submittedBy, date, amount});
             setEditing(false);
             await onChanged();
         } catch (e: any) {
