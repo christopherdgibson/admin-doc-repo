@@ -24,6 +24,7 @@ export default function FileManager({api}: {api: ApiProps}) {
     const [uploading, setUploading] = useState<boolean>(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [category, setCategory] = useState('');
+    const [submittedBy, setSubmittedBy] = useState('');
     const [date, setDate]         = useState('');
     const [amount, setAmount] = useState('');
 
@@ -61,7 +62,7 @@ export default function FileManager({api}: {api: ApiProps}) {
         setIsError(false);
         try {
             const res = await api.upload(selectedFile);
-            await api.saveMeta(res.filename, category, date, amount);
+            await api.saveMeta(res.filename, category, submittedBy, date, amount);
             await loadFiles();
             setIsError(false);
             setMessage(`Uploaded: ${res.filename}`);
@@ -117,7 +118,6 @@ export default function FileManager({api}: {api: ApiProps}) {
                 <div className="sfm-upload-input-group">
                     <div className="sfm-upload-input">
                         <span>File</span>
-                        
                         <label className="sfm-upload-label">
                             Browse
                             <input type="file" onChange={handleFileSelect} disabled={uploading} />
@@ -139,6 +139,17 @@ export default function FileManager({api}: {api: ApiProps}) {
                         >
                             <option value="">— None —</option>
                             {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    <div className="sfm-upload-input">
+                        <span>Submitted By</span> 
+                        <select
+                            className="sfm-inline-select"
+                            value={submittedBy}
+                            onChange={e => setSubmittedBy(e.target.value)}
+                        >
+                            <option value="">— None —</option>
+                            {window.SFM.submissions.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </div>
                     <div className="sfm-upload-input">
@@ -191,6 +202,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                             {([
                                 { col: 'filename', label: 'Filename' },
                                 { col: 'category', label: 'Category' },
+                                { col: 'submittedBy', label: 'Submitted By' },
                                 { col: 'date',     label: 'Date' },
                                 { col: 'amount', label: 'Amount' },
                                 { col: 'size',     label: 'Size' },

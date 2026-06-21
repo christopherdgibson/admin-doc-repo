@@ -16,6 +16,10 @@
     	"categories": {
 			"type": "array",
 			"default": ["Candles", "Coffee", "Milk/Sugar", "Kitchen Roll", "Tea"]
+		},
+		"submissions": {
+			"type": "array",
+			"default": ["Employee", "Supplier"]
 		}
 	},
 	"supports": {

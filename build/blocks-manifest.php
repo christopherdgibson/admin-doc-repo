@@ -27,6 +27,13 @@ return array(
 					'Kitchen Roll',
 					'Tea'
 				)
+			),
+			'submissions' => array(
+				'type' => 'array',
+				'default' => array(
+					'Employee',
+					'Supplier'
+				)
 			)
 		),
 		'supports' => array(

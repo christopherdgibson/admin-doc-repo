@@ -6,6 +6,7 @@ wp_localize_script(
         'apiBase'    => rest_url('sfm/v1'),
         'nonce'      => wp_create_nonce('wp_rest'),
         'categories' => $attributes['categories'] ?? ['Reports', 'Invoices', 'Contracts', 'Other'],
+        'submissions' => $attributes['submissions'] ?? ['Employee', 'Admin'],
     ]
 );
 ?>

@@ -4,12 +4,16 @@ export interface SfmFile {
     uploaded: number;
     url: string;
     category: string;
+    submittedBy: string;
     date: string;
+    amount: string;
 }
 
 export interface SfmMeta {
     category: string;
+    submittedBy: string;
     date: string;
+    amount: string;
 }
 
 export interface ApiResponse {
@@ -28,12 +32,13 @@ export interface ApiProps {
     upload: (file: File) => Promise<UploadResponse>;
     delete: (filename: string) => Promise<ApiResponse>;
     rename: (old_filename: string, new_filename: string) => Promise<ApiResponse>;
-    saveMeta: (filename: string, category: string, date: string, amount: string) => Promise<ApiResponse>;
+    saveMeta: (filename: string, category: string, submittedBy: string, date: string, amount: string) => Promise<ApiResponse>;
 }
 
 export interface BlockAttributes {
     align: string;
     categories: string[];
+    submissions: string[];
 }
 
 export interface SetAttributesProps {

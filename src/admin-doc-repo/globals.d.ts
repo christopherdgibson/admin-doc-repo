@@ -4,6 +4,7 @@ declare global {
             apiBase: string;
             nonce: string;
             categories: string[];
+            submissions: string[];
         };
     }
 }

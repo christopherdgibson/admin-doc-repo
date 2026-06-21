@@ -5,8 +5,9 @@ import { useState } from '@wordpress/element';
 import type { EditProps } from '@block-root/types';
 
 export default function Edit({ attributes, setAttributes }: EditProps) {
-    const { categories } = attributes;
+    const { categories, submissions } = attributes;
     const [newCategory, setNewCategory] = useState('');
+    const [newSubmittedBy, setNewSubmittedBy] = useState('');
 
     function addCategory() {
         if (newCategory.trim()) {
@@ -15,8 +16,19 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         }
     }
 
+    function addSubmittedBy() {
+        if (newSubmittedBy.trim()) {
+            setAttributes({ submissions: [...submissions, newSubmittedBy.trim()] });
+            setNewSubmittedBy('');
+        }
+    }
+
     function removeCategory(index: number) {
         setAttributes({ categories: categories.filter((_, i) => i !== index) });
+    }
+
+    function removeSubmittedBy(index: number) {
+        setAttributes({ submissions: submissions.filter((_, i) => i !== index) });
     }
 
     return (
@@ -35,6 +47,20 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                         onChange={setNewCategory}
                     />
                     <Button isPrimary onClick={addCategory}>Add</Button>
+                </PanelBody>
+                <PanelBody title="Submitted By">
+                    {submissions.map((sub, i) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                            <span>{sub}</span>
+                            <Button isDestructive isSmall onClick={() => removeSubmittedBy(i)}>Remove</Button>
+                        </div>
+                    ))}
+                    <TextControl
+                        label="New submittor"
+                        value={newSubmittedBy}
+                        onChange={setNewSubmittedBy}
+                    />
+                    <Button isPrimary onClick={addSubmittedBy}>Add</Button>
                 </PanelBody>
             </InspectorControls>
 

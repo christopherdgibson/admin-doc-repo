@@ -15,6 +15,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     const [editing, setEditing]   = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [category, setCategory] = useState(file.category);
+    const [submittedBy, setSubmittedBy] = useState(file.submittedBy);
     const [date, setDate]         = useState(file.date);
     const [amount, setAmount] = useState(file.amount);
     const [newName, setNewName]   = useState(file.filename);
@@ -30,7 +31,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     async function saveMeta() {
         try {
-            await api.saveMeta(file.filename, category, date, amount);
+            await api.saveMeta(file.filename, category, submittedBy, date, amount);
             setEditing(false);
             await onChanged();
         } catch (e: any) {
@@ -40,6 +41,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     function cancelEdit() {
         setCategory(file.category);
+        setSubmittedBy(file.submittedBy);
         setDate(file.date);
         setAmount(file.Amount);
         setEditing(false);
@@ -110,6 +112,20 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                     </select>
                 ) : (
                     file.category || <span style={{ color: '#aaa' }}>—</span>
+                )}
+            </td>
+            <td>
+                {editing ? (
+                    <select
+                        className="sfm-inline-select"
+                        value={submittedBy}
+                        onChange={e => setSubmittedBy(e.target.value)}
+                    >
+                        <option value="">— None —</option>
+                        {window.SFM.submissions.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                ) : (
+                    file.submittedBy || <span style={{ color: '#aaa' }}>—</span>
                 )}
             </td>
             <td>
