@@ -72,6 +72,8 @@ export default function FileManager({api}: {api: ApiProps}) {
         setCategory('');
         setDate('');
         setAmount('');
+        setMessage('');
+        setIsError(false);
     }
 
     async function handleLogout() {

@@ -56,6 +56,10 @@ export interface EditProps extends SetAttributesProps {
     attributes: BlockAttributes;
 }
 
+export type ArrayKeys<T> = {
+    [K in keyof T]: T[K] extends any[] ? K : never;
+} [keyof T];
+
 export type OnClick = () => void;
 
 export type OnChange = (value: string) => void;
