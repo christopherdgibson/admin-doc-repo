@@ -3,11 +3,12 @@ import { useState, useEffect } from '@wordpress/element';
 import FileRow from "@components/FileRow";
 import SortIcon from "@components/SortIcon";
 
-import type { ApiProps, SfmFile } from '@block-root/types';
+import type { ApiProps, SfmFile, SortKey } from '@block-root/types';
+import { getSortValue } from '@block-root/types';
 
 export default function FileManager({api}: {api: ApiProps}) {
+    const [sortBy, setSortBy] = useState<SortKey>('filename');
     const [files, setFiles]       = useState<SfmFile[]>([]);
-    const [sortBy, setSortBy]     = useState<keyof SfmFile>('filename');
     const [sortAsc, setSortAsc]   = useState<boolean>(true);
     const [filterCat, setFilter]  = useState<string>('');
     const [message, setMessage]   = useState<string>('');
@@ -32,7 +33,7 @@ export default function FileManager({api}: {api: ApiProps}) {
 
     useEffect(() => { loadFiles(); }, []);
 
-    function handleSort(col: keyof SfmFile) {
+    function handleSort(col: SortKey) {
         if (sortBy === col) {
             setSortAsc(prev => !prev);
         } else {
@@ -79,13 +80,13 @@ export default function FileManager({api}: {api: ApiProps}) {
     }
 
     const sorted = [...files]
-        .filter(f => !filterCat || f.category === filterCat)
+        .filter(f => !filterCat || f.meta.category === filterCat)
         .sort((a, b) => {
-            const av = a[sortBy] ?? '';
-            const bv = b[sortBy] ?? '';
-            const dir = sortAsc === true ? 1 : -1;
+            const av = getSortValue(a, sortBy);
+            const bv = getSortValue(b, sortBy);
+            const dir = sortAsc ? 1 : -1;
             return av > bv ? dir : av < bv ? -dir : 0;
-        });
+    });
 
     return (
         <div>
@@ -194,16 +195,12 @@ export default function FileManager({api}: {api: ApiProps}) {
                                 { col: 'filename', label: 'Filename' },
                                 { col: 'category', label: 'Category' },
                                 { col: 'submittedBy', label: 'Submitted By' },
-                                { col: 'date',     label: 'Date' },
+                                { col: 'date', label: 'Date' },
                                 { col: 'amount', label: 'Amount' },
-                                { col: 'size',     label: 'Size' },
+                                { col: 'size', label: 'Size' },
                                 { col: 'uploaded', label: 'Uploaded' },
-                            ] as { col: keyof SfmFile; label: string }[]).map(({ col, label }) => (
-                                <th
-                                    key={col}
-                                    className="sortable"
-                                    onClick={() => handleSort(col)}
-                                >
+                            ] as { col: SortKey; label: string }[]).map(({ col, label }) => (
+                                <th key={col} className="sortable" onClick={() => handleSort(col)}>
                                     {label}
                                     <SortIcon col={col} sortBy={sortBy} sortAsc={sortAsc} />
                                 </th>

@@ -1,8 +1,8 @@
-import type { SfmFile } from "@block-root/types";
+import type { SfmFile, SortKey } from "@block-root/types";
 
 interface SortIconProps {
-	col: string;
-	sortBy: keyof SfmFile;
+	col: SortKey;
+	sortBy: SortKey;
 	sortAsc: boolean;
 }
 

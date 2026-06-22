@@ -3,10 +3,7 @@ export interface SfmFile {
     size: number;
     uploaded: number;
     url: string;
-    category: string;
-    submittedBy: string;
-    date: string;
-    amount: string;
+    meta: SfmMeta;
 }
 
 export interface SfmMeta {
@@ -14,6 +11,16 @@ export interface SfmMeta {
     submittedBy: string;
     date: string;
     amount: string;
+}
+
+export type SortKey = 'filename' | 'size' | 'uploaded' | keyof SfmMeta;
+
+export function getSortValue(file: SfmFile, key: SortKey) {
+    if (key in file.meta) {
+        return file.meta[key as keyof SfmMeta];
+    }
+    
+    return file[key as keyof Omit<SfmFile, 'meta'>];
 }
 
 export interface ApiResponse {

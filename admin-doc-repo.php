@@ -163,10 +163,12 @@ function sfm_api_list_files() {
             'size'     => filesize($filepath),
             'uploaded' => filemtime($filepath),
             'url'      => SFM_UPLOAD_URL . $basename,
-            'category' => $meta['category'] ?? '',
-            'submittedBy' => $meta['submittedBy'] ?? '',
-            'date'     => $meta['date'] ?? '',
-			'amount'   => $meta['amount'] ?? '',
+            'meta'     => [
+                'category'    => $meta['category'] ?? '',
+                'submittedBy' => $meta['submittedBy'] ?? '',
+                'date'        => $meta['date'] ?? '',
+                'amount'      => $meta['amount'] ?? '',
+            ],
         ];
     }
     return rest_ensure_response($result);

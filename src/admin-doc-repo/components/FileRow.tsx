@@ -1,27 +1,27 @@
 import { useEffect, useState } from '@wordpress/element';
 import type { Dispatch, SetStateAction } from "react";
 
-import type { ApiProps } from '@block-root/types'
+import type { ApiProps, SfmFile } from '@block-root/types'
 
 interface FileRowProps {
     api: ApiProps,
-    file: any,
+    file: SfmFile,
     onChanged: () => Promise<void>;
     setMessage: Dispatch<SetStateAction<string>>;
     setIsError: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function FileRow({ api, file, onChanged, setMessage, setIsError }: FileRowProps) {
-    const [editing, setEditing]   = useState(false);
+    const [editing, setEditing] = useState(false);
     const [renaming, setRenaming] = useState(false);
-    const [category, setCategory] = useState(file.category);
-    const [submittedBy, setSubmittedBy] = useState(file.submittedBy);
-    const [date, setDate]         = useState(file.date);
-    const [amount, setAmount] = useState(file.amount);
-    const [newName, setNewName]   = useState(file.filename);
+    const [category, setCategory] = useState(file.meta.category);
+    const [submittedBy, setSubmittedBy] = useState(file.meta.submittedBy);
+    const [date, setDate] = useState(file.meta.date);
+    const [amount, setAmount] = useState(file.meta.amount);
+    const [newName, setNewName] = useState(file.filename);
 
     const [localMessage, setLocalMessage] = useState('');
-    const [localError, setLocalError]     = useState('');
+    const [localError, setLocalError] = useState('');
 
     useEffect(() => {
         if (!localMessage) return;
@@ -40,10 +40,10 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     }
 
     function cancelEdit() {
-        setCategory(file.category);
-        setSubmittedBy(file.submittedBy);
-        setDate(file.date);
-        setAmount(file.Amount);
+        setCategory(file.meta.category);
+        setSubmittedBy(file.meta.submittedBy);
+        setDate(file.meta.date);
+        setAmount(file.meta.amount);
         setEditing(false);
         setLocalError('');
     }
@@ -111,7 +111,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                         {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 ) : (
-                    file.category || <span style={{ color: '#aaa' }}>—</span>
+                    file.meta.category || <span style={{ color: '#aaa' }}>—</span>
                 )}
             </td>
             <td>
@@ -125,7 +125,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                         {window.SFM.submissions.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 ) : (
-                    file.submittedBy || <span style={{ color: '#aaa' }}>—</span>
+                    file.meta.submittedBy || <span style={{ color: '#aaa' }}>—</span>
                 )}
             </td>
             <td>
@@ -137,7 +137,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                         onChange={e => setDate(e.target.value)}
                     />
                 ) : (
-                    file.date || <span style={{ color: '#aaa' }}>—</span>
+                    file.meta.date || <span style={{ color: '#aaa' }}>—</span>
                 )}
             </td>
             <td>
@@ -151,7 +151,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                         onChange={e => setAmount(e.target.value)}
                     />
                 ) : (
-                    file.amount || <span style={{ color: '#aaa' }}>—</span>
+                    file.meta.amount || <span style={{ color: '#aaa' }}>—</span>
                 )}
             </td>
             <td style={{ color: '#888' }}>{sizeLabel}</td>
