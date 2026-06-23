@@ -1,6 +1,18 @@
 #sfm-app * { box-sizing: border-box; }
 
 #sfm-app, .sfm-edit-container {
+	--header-bg: #f6f7f7;
+	--header-bg-hover: #ececec;
+	//--header-bg: #c5dfff;
+	//--header-bg-hover: #dbebff;
+	--row-bg-hover: #fafafa;
+	--border-color: #ccc;
+	--label-text-color: #888;
+	--table-border-color: #e0e0e0;
+	--btn-primary-color: #2271b1;
+	--btn-hover-color: #f0f0f0;
+	--link-hover-color: #135e96;
+	--sub-header-background: #f6f7f7;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 14px;
 	color: #1e1e1e;
@@ -28,7 +40,7 @@
 .sfm-login input {
 	width: 100%;
 	padding: 8px 12px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--border-color);
 	border-radius: 4px;
 	font-size: 14px;
 	margin-bottom: 12px;
@@ -59,7 +71,7 @@
 
 .sfm-upload-input-group {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
+    grid-auto-flow: column;
     grid-template-rows: auto auto;
     align-items: center;
     column-gap: 16px;
@@ -87,10 +99,12 @@
 .sfm-upload-label {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 	gap: 6px;
 	padding: 8px 16px;
-	background: #2271b1;
+	background: var(--btn-primary-color);
 	color: #fff;
+	border: none;
 	border-radius: 4px;
 	cursor: pointer;
 	font-size: 13px;
@@ -98,12 +112,13 @@
 	transition: background 0.15s;
 }
 
-.sfm-upload-label:hover { background: #135e96; }
+.sfm-upload-label:hover { background: var(--link-hover-color); }
 .sfm-upload-label input { display: none; }
+.label-text {color: var(--label-text-color);}
 
 .sfm-select {
 	padding: 7px 10px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--border-color);
 	border-radius: 4px;
 	font-size: 13px;
 	background: #fff;
@@ -112,7 +127,7 @@
 
 .sfm-btn {
 	padding: 6px 12px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--border-color);
 	border-radius: 4px;
 	background: #fff;
 	font-size: 13px;
@@ -120,15 +135,15 @@
 	transition: background 0.15s, border-color 0.15s;
 }
 
-.sfm-btn:hover { background: #f0f0f0; }
+.sfm-btn:hover { background: var(--btn-hover-color); }
 
 .sfm-btn-primary {
-	background: #2271b1;
+	background: var(--btn-primary-color);
 	color: #fff;
-	border-color: #2271b1;
+	border-color: var(--btn-primary-color);
 }
 
-.sfm-btn-primary:hover { background: #135e96; border-color: #135e96; }
+.sfm-btn-primary:hover { background: var(--link-hover-color); border-color: var(--link-hover-color); }
 
 .sfm-btn-danger {
 	color: #c0392b;
@@ -140,26 +155,55 @@
 .sfm-btn-link {
 	background: none;
 	border: none;
-	color: #2271b1;
+	color: var(--btn-primary-color);
 	padding: 0;
 	cursor: pointer;
 	font-size: 13px;
 	text-decoration: underline;
 }
 
-.sfm-btn-link:hover { color: #135e96; }
+.sfm-btn-link:hover { color: var(--link-hover-color); }
+
+.sfm-expand-btn-container {
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background: #fff;
+	cursor: pointer;
+	transition: background 0.15s, border-color 0.15s;
+	display: flex;
+	gap: 4px;
+	justify-content: space-between;
+	align-items: center;
+	min-width: 110px;
+	padding: 0 6px;
+	&:hover { background: var(--btn-hover-color); }
+}
+
+.sfm-expand-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 24px;
+    //padding: 4px 8px;
+    transition: transform 0.15s ease;
+    display: inline-block;
+}
+
+.sfm-expand-btn.sfm-expanded {
+    transform: rotate(180deg);
+}
 
 table.sfm-table {
 	width: 100%;
 	border-collapse: collapse;
 	background: #fff;
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--table-border-color);
 	border-radius: 8px;
 	overflow: hidden;
 }
 
 .sfm-table th {
-	background: #f6f7f7;
+	background: var(--header-bg);
 	padding: 10px 14px;
 	text-align: left;
 	font-weight: 600;
@@ -167,22 +211,22 @@ table.sfm-table {
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	color: #555;
-	border-bottom: 1px solid #e0e0e0;
+	border-bottom: 1px solid var(--table-border-color);
 	white-space: nowrap;
 	user-select: none;
 }
 
 .sfm-table th.sortable { cursor: pointer; }
-.sfm-table th.sortable:hover { background: #ececec; }
+.sfm-table th.sortable:hover { background: var(--header-bg-hover); }
 
 .sfm-table td {
 	padding: 10px 14px;
-	border-bottom: 1px solid #f0f0f0;
+	border-bottom: 1px solid var(--btn-hover-color);
 	vertical-align: middle;
 }
 
 .sfm-table tr:last-child td { border-bottom: none; }
-.sfm-table tr:hover td { background: #fafafa; }
+.sfm-table tr:hover td { background: var(--row-bg-hover) }
 
 .sfm-actions {
 	display: flex;
@@ -193,15 +237,16 @@ table.sfm-table {
 
 .sfm-rename-input {
 	padding: 5px 8px;
-	border: 1px solid #2271b1;
+	border: 1px solid var(--btn-primary-color);
 	border-radius: 4px;
 	font-size: 13px;
 	width: 200px;
 }
 
 .sfm-inline-select {
+	cursor: pointer;
 	padding: 5px 8px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--border-color);
 	border-radius: 4px;
 	font-size: 13px;
 	background: #fff;
@@ -210,9 +255,14 @@ table.sfm-table {
 .sfm-amount-input,
 .sfm-date-input {
 	padding: 5px 8px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--border-color);
 	border-radius: 4px;
 	font-size: 13px;
+}
+
+.sfm-date-input {
+	cursor: pointer;
+	width: fit-content;
 }
 
 .sfm-amount-input {
@@ -220,18 +270,31 @@ table.sfm-table {
 	min-width: 4em;
 }
 
+.sfm-table-expenses {
+	th {
+		background-color: var(--sub-header-background);
+	}
+}
+
+.sfm-expenses {
+	color: var(--label-text-color);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
 .sfm-empty {
 	text-align: center;
 	padding: 48px;
-	color: #888;
+	color: var(--label-text-color);
 	background: #fff;
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--table-border-color);
 	border-radius: 8px;
 }
 
 .sfm-logout {
 	font-size: 12px;
-	color: #888;
+	color: var(--label-text-color);
 	cursor: pointer;
 	background: none;
 	border: none;
@@ -242,5 +305,5 @@ table.sfm-table {
 
 .sfm-uploading {
 	font-size: 13px;
-	color: #2271b1;
+	color: var(--btn-primary-color);
 }

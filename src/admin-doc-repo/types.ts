@@ -1,26 +1,37 @@
-export interface SfmFile {
-    filename: string;
-    size: number;
-    uploaded: number;
-    url: string;
-    meta: SfmMeta;
-}
-
-export interface SfmMeta {
+export interface SfmMetaRow {
     category: string;
     submittedBy: string;
     date: string;
     amount: string;
 }
 
-export type SortKey = 'filename' | 'size' | 'uploaded' | keyof SfmMeta;
+export interface SfmFile {
+    filename: string;
+    size: number;
+    uploaded: number;
+    url: string;
+    meta: SfmMetaRow[];
+}
 
-export function getSortValue(file: SfmFile, key: SortKey) {
-    if (key in file.meta) {
-        return file.meta[key as keyof SfmMeta];
-    }
+export type SortKey = 'filename' | 'size' | 'uploaded' | keyof SfmMetaRow;
+
+// export function getSortValue(file: SfmFile, key: SortKey) {
+//     if (key in file.meta) {
+//         return file.meta[key as keyof SfmMetaRow[]];
+//     }
     
-    return file[key as keyof Omit<SfmFile, 'meta'>];
+//     return file[key as keyof Omit<SfmFile, 'meta'>];
+// }
+
+export function getSortValue(file: SfmFile, key: SortKey): string | number {
+    if (key === 'filename' || key === 'size' || key === 'uploaded') {
+        return file[key];
+    }
+    // For meta keys, aggregate across all rows for sorting purposes
+    // e.g. sort by the first row's value, or empty string if no rows
+    const firstRow = file.meta[0];
+    if (!firstRow) return '';
+    return firstRow[key as keyof SfmMetaRow] ?? '';
 }
 
 export interface ApiResponse {
@@ -39,7 +50,7 @@ export interface ApiProps {
     upload: (file: File) => Promise<UploadResponse>;
     delete: (filename: string) => Promise<ApiResponse>;
     rename: (old_filename: string, new_filename: string) => Promise<ApiResponse>;
-    saveMeta: (filename: string, meta: SfmMeta) => Promise<ApiResponse>;
+    saveMeta: (filename: string, rows: SfmMetaRow[]) => Promise<ApiResponse>;
 }
 
 export interface BlockAttributes {

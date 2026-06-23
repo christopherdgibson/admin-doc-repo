@@ -163,12 +163,7 @@ function sfm_api_list_files() {
             'size'     => filesize($filepath),
             'uploaded' => filemtime($filepath),
             'url'      => SFM_UPLOAD_URL . $basename,
-            'meta'     => [
-                'category'    => $meta['category'] ?? '',
-                'submittedBy' => $meta['submittedBy'] ?? '',
-                'date'        => $meta['date'] ?? '',
-                'amount'      => $meta['amount'] ?? '',
-            ],
+            'meta'     => sfm_get_meta($basename) ?: [],  // empty array for initial upload
         ];
     }
     return rest_ensure_response($result);
@@ -238,22 +233,23 @@ function sfm_api_rename(WP_REST_Request $request) {
 }
 
 function sfm_api_save_meta(WP_REST_Request $request) {
-    $filename = sanitize_file_name($request->get_param('filename'));
-    $filename = sanitize_file_name($request->get_param('filename'));
-    $meta_input = $request->get_param('meta') ?? [];
+    $filename   = sanitize_file_name($request->get_param('filename'));
+    $rows_input = $request->get_param('rows') ?? [];
 
-    $meta = [
-        'category'     => sanitize_text_field($meta_input['category'] ?? ''),
-        'submittedBy'  => sanitize_text_field($meta_input['submittedBy'] ?? ''),
-        'date'         => sanitize_text_field($meta_input['date'] ?? ''),
-        'amount'       => sanitize_text_field($meta_input['amount'] ?? ''),
-    ];
+    $rows = array_map(function($row) {
+        return [
+            'category'    => sanitize_text_field($row['category'] ?? ''),
+            'submittedBy' => sanitize_text_field($row['submittedBy'] ?? ''),
+            'date'        => sanitize_text_field($row['date'] ?? ''),
+            'amount'      => sanitize_text_field($row['amount'] ?? ''),
+        ];
+    }, $rows_input);
 
     if (!file_exists(SFM_UPLOAD_DIR . $filename)) {
         return new WP_Error('not_found', 'File not found', ['status' => 404]);
     }
 
-    sfm_save_meta($filename, $meta);
+    sfm_save_meta($filename, $rows);
     return rest_ensure_response(['success' => true]);
 }
 

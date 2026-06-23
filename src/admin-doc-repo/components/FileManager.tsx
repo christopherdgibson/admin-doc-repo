@@ -54,7 +54,7 @@ export default function FileManager({api}: {api: ApiProps}) {
         setIsError(false);
         try {
             const res = await api.upload(selectedFile);
-            await api.saveMeta(res.filename, {category, submittedBy, date, amount});
+            //await api.saveMeta(res.filename);
             await loadFiles();
             setIsError(false);
             setMessage(`Uploaded: ${res.filename}`);
@@ -82,14 +82,14 @@ export default function FileManager({api}: {api: ApiProps}) {
     }
 
     const sorted = [...files]
-        .filter(f => !filterCat || f.meta.category === filterCat)
-        .sort((a, b) => {
-            const av = getSortValue(a, sortBy);
-            const bv = getSortValue(b, sortBy);
-            const dir = sortAsc ? 1 : -1;
-            return av > bv ? dir : av < bv ? -dir : 0;
+    .filter(f => !filterCat || f.meta.some(row => row.category === filterCat))
+    .sort((a, b) => {
+        const av = getSortValue(a, sortBy);
+        const bv = getSortValue(b, sortBy);
+        const dir = sortAsc ? 1 : -1;
+        return av > bv ? dir : av < bv ? -dir : 0;
     });
-
+    
     return (
         <div>
             {message && <p className={isError ? "sfm-error" : "sfm-success"}>{message}</p>}
@@ -177,7 +177,6 @@ export default function FileManager({api}: {api: ApiProps}) {
                             {uploading ? 'Uploading...' : 'Upload'}
                         </button>
                     )}
-
                     {selectedFile && !uploading && (
                         <button className="sfm-btn" onClick={clearUpload}>
                             Clear
@@ -195,11 +194,8 @@ export default function FileManager({api}: {api: ApiProps}) {
                         <tr>
                             {([
                                 { col: 'filename', label: 'Filename' },
-                                { col: 'category', label: 'Category' },
-                                { col: 'submittedBy', label: 'Submitted By' },
-                                { col: 'date', label: 'Date' },
-                                { col: 'amount', label: 'Amount' },
-                                { col: 'size', label: 'Size' },
+                                { col: 'summary',  label: 'Expenses' },   // computed, consider sorting logic
+                                { col: 'size',     label: 'Size' },
                                 { col: 'uploaded', label: 'Uploaded' },
                             ] as { col: SortKey; label: string }[]).map(({ col, label }) => (
                                 <th key={col} className="sortable" onClick={() => handleSort(col)}>
@@ -207,7 +203,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                                     <SortIcon col={col} sortBy={sortBy} sortAsc={sortAsc} />
                                 </th>
                             ))}
-                            <th>Actions</th>
+                            <th>File management</th>
                         </tr>
                     </thead>
                     <tbody>

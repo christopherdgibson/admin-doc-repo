@@ -1,4 +1,4 @@
-import type { SfmFile, SortKey } from "@block-root/types";
+import type { SortKey } from "@block-root/types";
 
 interface SortIconProps {
 	col: SortKey;

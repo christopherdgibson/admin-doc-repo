@@ -1,7 +1,10 @@
 import { useEffect, useState } from '@wordpress/element';
 import type { Dispatch, SetStateAction } from "react";
 
-import type { ApiProps, SfmFile } from '@block-root/types'
+import type { ApiProps, SfmFile, SfmMetaRow } from '@block-root/types'
+
+import ExpenseRow from '@components/ExpenseRow';
+import ExpandButton from '@components/ExpandButton';
 
 interface FileRowProps {
     api: ApiProps,
@@ -12,12 +15,9 @@ interface FileRowProps {
 }
 
 export default function FileRow({ api, file, onChanged, setMessage, setIsError }: FileRowProps) {
-    const [editing, setEditing] = useState(false);
+    const [rows, setRows] = useState<SfmMetaRow[]>(file.meta);
+    const [rowExpanded, setRowExpanded] = useState(false);
     const [renaming, setRenaming] = useState(false);
-    const [category, setCategory] = useState(file.meta.category);
-    const [submittedBy, setSubmittedBy] = useState(file.meta.submittedBy);
-    const [date, setDate] = useState(file.meta.date);
-    const [amount, setAmount] = useState(file.meta.amount);
     const [newName, setNewName] = useState(file.filename);
 
     const [localMessage, setLocalMessage] = useState('');
@@ -29,23 +29,27 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
         return () => clearTimeout(timer);
     }, [localMessage]);
 
-    async function saveMeta() {
+    function addRow() {
+        saveEdit([...rows, { category: '', submittedBy: '', date: '', amount: '' }]);
+    }
+
+    function removeRow(index: number) {
+        saveEdit(rows.filter((_, i) => i !== index));
+    }
+
+    function updateRow(index: number, updated: SfmMetaRow) {
+        saveEdit(rows.map((row, i) => i === index ? updated : row));
+    }
+
+    async function saveEdit(newRows: SfmMetaRow[]) {
         try {
-            await api.saveMeta(file.filename, {category, submittedBy, date, amount});
-            setEditing(false);
+            await api.saveMeta(file.filename, newRows);
+            setRows(newRows);
             await onChanged();
+            setLocalMessage('Saved.');
         } catch (e: any) {
             setLocalError(e.message);
         }
-    }
-
-    function cancelEdit() {
-        setCategory(file.meta.category);
-        setSubmittedBy(file.meta.submittedBy);
-        setDate(file.meta.date);
-        setAmount(file.meta.amount);
-        setEditing(false);
-        setLocalError('');
     }
 
     async function saveRename() {
@@ -78,6 +82,15 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
         }
     }
 
+    function getFileSummary(meta: SfmMetaRow[]) {
+        const total = meta.reduce((sum, row) => sum + parseFloat(row.amount || '0'), 0);
+        return `€ ${total.toFixed(2)}`;
+    }
+
+    const fileSummary = getFileSummary(rows);
+
+    const expensesText = `${rows.length} expense${rows.length !== 1 ? 's' : ''}`;
+
     const sizeLabel = file.size > 1024 * 1024
         ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
         : `${(file.size / 1024).toFixed(1)} KB`;
@@ -85,98 +98,72 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     const uploadedLabel = new Date(file.uploaded * 1000).toLocaleDateString();
 
     return (
-        <tr>
-            <td>
-                {renaming ? (
-                    <input
-                        className="sfm-rename-input"
-                        value={newName}
-                        onChange={e => setNewName(e.target.value)}
-                        autoFocus
-                    />
-                ) : (
-                    <a href={file.url} download className="sfm-btn-link">{file.filename}</a>
-                )}
-                {localMessage && <span className="sfm-success" style={{ display: 'block', marginTop: 4 }}>{localMessage}</span>}
-                {localError && <span className="sfm-error" style={{ display: 'block', marginTop: 4 }}>{localError}</span>}
-            </td>
-            <td>
-                {editing ? (
-                    <select
-                        className="sfm-inline-select"
-                        value={category}
-                        onChange={e => setCategory(e.target.value)}
-                    >
-                        <option value="">— None —</option>
-                        {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                ) : (
-                    file.meta.category || <span style={{ color: '#aaa' }}>—</span>
-                )}
-            </td>
-            <td>
-                {editing ? (
-                    <select
-                        className="sfm-inline-select"
-                        value={submittedBy}
-                        onChange={e => setSubmittedBy(e.target.value)}
-                    >
-                        <option value="">— None —</option>
-                        {window.SFM.submissions.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                ) : (
-                    file.meta.submittedBy || <span style={{ color: '#aaa' }}>—</span>
-                )}
-            </td>
-            <td>
-                {editing ? (
-                    <input
-                        type="date"
-                        className="sfm-date-input"
-                        value={date}
-                        onChange={e => setDate(e.target.value)}
-                    />
-                ) : (
-                    file.meta.date || <span style={{ color: '#aaa' }}>—</span>
-                )}
-            </td>
-            <td>
-                {editing ? (
-                    <input
-                        type="number"
-                        step="0.01"
-                        size={6}
-                        className="sfm-amount-input"
-                        value={amount}
-                        onChange={e => setAmount(e.target.value)}
-                    />
-                ) : (
-                    file.meta.amount || <span style={{ color: '#aaa' }}>—</span>
-                )}
-            </td>
-            <td style={{ color: '#888' }}>{sizeLabel}</td>
-            <td style={{ color: '#888' }}>{uploadedLabel}</td>
-            <td>
-                <div className="sfm-actions">
+        <>
+            <tr>
+                <td>
                     {renaming ? (
-                        <>
-                            <button className="sfm-btn sfm-btn-primary" onClick={saveRename}>Save</button>
-                            <button className="sfm-btn" onClick={cancelRename}>Cancel</button>
-                        </>
-                    ) : editing ? (
-                        <>
-                            <button className="sfm-btn sfm-btn-primary" onClick={saveMeta}>Save</button>
-                            <button className="sfm-btn" onClick={cancelEdit}>Cancel</button>
-                        </>
+                        <input
+                            className="sfm-rename-input"
+                            value={newName}
+                            onChange={e => setNewName(e.target.value)}
+                            autoFocus
+                        />
                     ) : (
-                        <>
-                            <button className="sfm-btn" onClick={() => setRenaming(true)}>Rename</button>
-                            <button className="sfm-btn" onClick={() => setEditing(true)}>Edit</button>
-                            <button className="sfm-btn sfm-btn-danger" onClick={handleDelete}>Delete</button>
-                        </>
+                        <a href={file.url} download className="sfm-btn-link">{file.filename}</a>
                     )}
-                </div>
-            </td>
-        </tr>
+                    {localMessage && <span className="sfm-success" style={{ display: 'block', marginTop: 4 }}>{localMessage}</span>}
+                    {localError && <span className="sfm-error" style={{ display: 'block', marginTop: 4 }}>{localError}</span>}
+                </td>
+                <td className={'sfm-expenses'}>
+                    {fileSummary}
+                    <ExpandButton text={expensesText} rowExpanded={rowExpanded} setRowExpanded={setRowExpanded}/>
+                </td>
+                <td className={'label-text'}>{sizeLabel}</td>
+                <td className={'label-text'}>{uploadedLabel}</td>
+                <td>
+                    <div className="sfm-actions">
+                        {renaming ? (
+                            <>
+                                <button className="sfm-btn sfm-btn-primary" onClick={saveRename}>Save</button>
+                                <button className="sfm-btn" onClick={cancelRename}>Cancel</button>
+                            </>
+                        ) : (
+                            <>
+                                <button className="sfm-btn" onClick={() => setRenaming(true)}>Rename</button>
+                                <button className="sfm-btn sfm-btn-danger" onClick={handleDelete}>Delete</button>
+                            </>
+                        )}
+                    </div>
+                </td>
+            </tr>
+            {rowExpanded && (
+                <tr>
+                    <td colSpan={5}>
+                        <table className="sfm-table sfm-table-expenses">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Submitted By</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rows.map((row, i) => (
+                                    <ExpenseRow
+                                        key={i}
+                                        row={row}
+                                        onChange={updated => updateRow(i, updated)}
+                                        onRemove={() => removeRow(i)}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                        <button style={{marginTop: '10px'}} className="sfm-upload-label" onClick={addRow}>+ Add Expense</button>
+                    </td>
+                </tr>
+            )}
+        </>
     );
 }
