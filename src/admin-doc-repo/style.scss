@@ -1,18 +1,67 @@
 #sfm-app * { box-sizing: border-box; }
 
 #sfm-app, .sfm-edit-container {
-	--header-bg: #f6f7f7;
-	--header-bg-hover: #ececec;
-	//--header-bg: #c5dfff;
-	//--header-bg-hover: #dbebff;
-	--row-bg-hover: #fafafa;
-	--border-color: #ccc;
-	--label-text-color: #888;
-	--table-border-color: #e0e0e0;
-	--btn-primary-color: #2271b1;
-	--btn-hover-color: #f0f0f0;
-	--link-hover-color: #135e96;
-	--sub-header-background: #f6f7f7;
+
+	/* ── Base neutrals ── */
+    // --neutral-base: #f6f7f7;
+    // --border-base: #e0e0e0;
+
+	--neutral-base: #c5dfff;
+	--border-base: #dbebff;
+
+    /* ── Derived neutrals ── */
+    --header-bg: var(--neutral-base);
+    --header-bg-hover: color-mix(in srgb, var(--neutral-base) 80%, black);
+    --row-bg-hover: color-mix(in srgb, var(--neutral-base) 60%, white);
+    --btn-hover-color: color-mix(in srgb, var(--neutral-base) 95%, black);
+
+    --table-border-color: var(--border-base);
+    --login-border-color: color-mix(in srgb, var(--border-base) 80%, white);
+    --border-color: color-mix(in srgb, var(--border-base) 95%, black);
+
+	--row-bg-expanded: #f0f5fb;
+
+    /* ── Text ── */
+    --label-text-color: #888;
+    --text-color-subtle: #555;
+
+    /* ── Primary action ── */
+    --btn-primary-color: #2271b1;
+    --link-hover-color: color-mix(in srgb, var(--btn-primary-color) 80%, black);
+
+    /* ── Semantic ── */
+    --success-text-color: #27ae60;
+    --error-text-color: #c0392b;
+    --error-border-color: color-mix(in srgb, var(--error-text-color) 30%, white);
+    --error-hover-color: color-mix(in srgb, var(--error-text-color) 5%, white);
+
+	--expense-table-header-color: #efefef;
+	--expense-table-border-color: #eee;
+	--expense-table-text-color: #666;
+
+	--radius: 8px;
+	--radius-sm: 4px;
+
+	// --header-bg: #f6f7f7;
+	// --header-bg-hover: #ececec;
+	// //--header-bg: #c5dfff;
+	// //--header-bg-hover: #dbebff;
+	// --row-bg-hover: #fafafa;
+	// --border-color: #ccc;
+
+	// --table-border-color: #e0e0e0;
+	// --login-border-color: #ddd;
+	// --btn-hover-color: #f0f0f0;
+	// --label-text-color: #888;
+	// --text-color-subtle: #555;
+
+	// --btn-primary-color: #2271b1;
+	// --link-hover-color: #135e96;
+	// --success-text-color: #27ae60;
+	// --error-text-color: #c0392b;
+	// --error-border-color: #e0b0ac;
+	// --error-hover-color: #fdf2f2;
+
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 14px;
 	color: #1e1e1e;
@@ -24,9 +73,9 @@
 .sfm-login {
 	max-width: 360px;
 	margin: 60px auto;
-	background: #fff;
-	border: 1px solid #ddd;
-	border-radius: 8px;
+	background: white;
+	border: 1px solid var(--login-border-color);
+	border-radius: var(--radius);
 	padding: 32px;
 	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
@@ -41,13 +90,13 @@
 	width: 100%;
 	padding: 8px 12px;
 	border: 1px solid var(--border-color);
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	font-size: 14px;
 	margin-bottom: 12px;
 }
 
-.sfm-error   { color: #c0392b; margin-bottom: 12px; font-size: 13px; }
-.sfm-success { color: #27ae60; margin-bottom: 12px; font-size: 13px; }
+.sfm-error   { color: var(--error-text-color); margin-bottom: 12px; font-size: 13px; }
+.sfm-success { color: var(--success-text-color); margin-bottom: 12px; font-size: 13px; }
 
 .sfm-toolbar {
 	display: flex;
@@ -93,7 +142,7 @@
 
 .sfm-selected-filename {
     font-size: 13px;
-    color: #555;
+    color: var(--text-color-subtle);
 }
 
 .sfm-upload-label {
@@ -103,9 +152,9 @@
 	gap: 6px;
 	padding: 8px 16px;
 	background: var(--btn-primary-color);
-	color: #fff;
+	color: white;
 	border: none;
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	cursor: pointer;
 	font-size: 13px;
 	font-weight: 500;
@@ -119,17 +168,21 @@
 .sfm-select {
 	padding: 7px 10px;
 	border: 1px solid var(--border-color);
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	font-size: 13px;
-	background: #fff;
+	background: white;
 	cursor: pointer;
+
+	&:hover {
+		background: var(--btn-hover-color);
+	}
 }
 
 .sfm-btn {
 	padding: 6px 12px;
 	border: 1px solid var(--border-color);
-	border-radius: 4px;
-	background: #fff;
+	border-radius: var(--radius-sm);
+	background: white;
 	font-size: 13px;
 	cursor: pointer;
 	transition: background 0.15s, border-color 0.15s;
@@ -139,18 +192,18 @@
 
 .sfm-btn-primary {
 	background: var(--btn-primary-color);
-	color: #fff;
+	color: white;
 	border-color: var(--btn-primary-color);
 }
 
 .sfm-btn-primary:hover { background: var(--link-hover-color); border-color: var(--link-hover-color); }
 
 .sfm-btn-danger {
-	color: #c0392b;
-	border-color: #e0b0ac;
+	color: var(--error-text-color);
+	border-color: var(--error-border-color);
 }
 
-.sfm-btn-danger:hover { background: #fdf2f2; }
+.sfm-btn-danger:hover { background: var(--error-hover-color); }
 
 .sfm-btn-link {
 	background: none;
@@ -165,9 +218,10 @@
 .sfm-btn-link:hover { color: var(--link-hover-color); }
 
 .sfm-expand-btn-container {
+	position: relative;
 	border: 1px solid var(--border-color);
-	border-radius: 4px;
-	background: #fff;
+	border-radius: var(--radius-sm);
+	background: white;
 	cursor: pointer;
 	transition: background 0.15s, border-color 0.15s;
 	display: flex;
@@ -196,9 +250,9 @@
 table.sfm-table {
 	width: 100%;
 	border-collapse: collapse;
-	background: #fff;
+	background: white;
 	border: 1px solid var(--table-border-color);
-	border-radius: 8px;
+	border-radius: var(--radius);
 	overflow: hidden;
 }
 
@@ -210,14 +264,14 @@ table.sfm-table {
 	font-size: 12px;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: #555;
+	color: var(--text-color-subtle);
 	border-bottom: 1px solid var(--table-border-color);
 	white-space: nowrap;
 	user-select: none;
 }
 
 .sfm-table th.sortable { cursor: pointer; }
-.sfm-table th.sortable:hover { background: var(--header-bg-hover); }
+.sfm-table > thead > tr > th.sortable:hover { background: var(--header-bg-hover); }
 
 .sfm-table td {
 	padding: 10px 14px;
@@ -226,7 +280,8 @@ table.sfm-table {
 }
 
 .sfm-table tr:last-child td { border-bottom: none; }
-.sfm-table tr:hover td { background: var(--row-bg-hover) }
+
+.sfm-table > tbody > tr:hover > td { background: var(--row-bg-hover); }
 
 .sfm-actions {
 	display: flex;
@@ -238,7 +293,7 @@ table.sfm-table {
 .sfm-rename-input {
 	padding: 5px 8px;
 	border: 1px solid var(--btn-primary-color);
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	font-size: 13px;
 	width: 200px;
 }
@@ -247,17 +302,26 @@ table.sfm-table {
 	cursor: pointer;
 	padding: 5px 8px;
 	border: 1px solid var(--border-color);
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	font-size: 13px;
-	background: #fff;
+	background: white;
+
+	&:hover {
+		background: var(--btn-hover-color);
+	}
+	
 }
 
 .sfm-amount-input,
 .sfm-date-input {
 	padding: 5px 8px;
 	border: 1px solid var(--border-color);
-	border-radius: 4px;
+	border-radius: var(--radius-sm);
 	font-size: 13px;
+
+	&:hover {
+		background: var(--btn-hover-color);
+	}
 }
 
 .sfm-date-input {
@@ -268,12 +332,6 @@ table.sfm-table {
 .sfm-amount-input {
 	width: fit-content;
 	min-width: 4em;
-}
-
-.sfm-table-expenses {
-	th {
-		background-color: var(--sub-header-background);
-	}
 }
 
 .sfm-expenses {
@@ -287,9 +345,9 @@ table.sfm-table {
 	text-align: center;
 	padding: 48px;
 	color: var(--label-text-color);
-	background: #fff;
+	background: white;
 	border: 1px solid var(--table-border-color);
-	border-radius: 8px;
+	border-radius: var(--radius);
 }
 
 .sfm-logout {
@@ -306,4 +364,71 @@ table.sfm-table {
 .sfm-uploading {
 	font-size: 13px;
 	color: var(--btn-primary-color);
+}
+
+.sfm-expense-row td {
+    background: #f9f9f9;
+    border-top: 2px solid var(--btn-primary-color);
+}
+
+.sfm-expense-panel {
+    padding: 16px;
+	width: 100%;
+}
+
+.sfm-expense-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+.sfm-expense-table tbody tr:hover td {
+    background: var(--row-bg-expanded);
+}
+
+.sfm-expense-table th {
+    background: var(--expense-table-header-color);
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--expense-table-text-color);
+}
+
+.sfm-expense-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--expense-table-border-color);
+    vertical-align: middle;
+	background: white;
+}
+
+.sfm-row-expanded td {
+    background: var(--row-bg-expanded);
+}
+
+.tooltip {
+	position: absolute;
+	left: 100%;
+	padding-left:12px;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+	white-space: nowrap;
+}
+
+.tooltip-inner {
+	color: var(--label-text-color);
+	background: white;
+	border: 1px solid var(--login-border-color);
+	border-radius: var(--radius-sm);
+	padding: 8px 12px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.sfm-expand-btn-container:hover .tooltip {
+	opacity: 1;
+	pointer-events: all;
 }

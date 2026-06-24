@@ -16,7 +16,7 @@ interface FileRowProps {
 
 export default function FileRow({ api, file, onChanged, setMessage, setIsError }: FileRowProps) {
     const [rows, setRows] = useState<SfmMetaRow[]>(file.meta);
-    const [rowExpanded, setRowExpanded] = useState(false);
+    const [expanded, setExpanded] = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [newName, setNewName] = useState(file.filename);
 
@@ -42,12 +42,16 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     }
 
     async function saveEdit(newRows: SfmMetaRow[]) {
+        const oldRows = rows;
         try {
-            await api.saveMeta(file.filename, newRows);
             setRows(newRows);
+            await api.saveMeta(file.filename, newRows);
             await onChanged();
             setLocalMessage('Saved.');
         } catch (e: any) {
+            // Revert to old rows on api failure
+            setRows(oldRows);
+            setLocalMessage('');
             setLocalError(e.message);
         }
     }
@@ -60,6 +64,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
             setLocalError('');
             setLocalMessage(`Renamed ${file.filename}.`);
         } catch (e: any) {
+            setLocalMessage('');
             setLocalError(e.message);
         }
     }
@@ -82,12 +87,12 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
         }
     }
 
-    function getFileSummary(meta: SfmMetaRow[]) {
+    function getTotalAmount(meta: SfmMetaRow[]) {
         const total = meta.reduce((sum, row) => sum + parseFloat(row.amount || '0'), 0);
         return `€ ${total.toFixed(2)}`;
     }
 
-    const fileSummary = getFileSummary(rows);
+    const totalAmount = getTotalAmount(rows);
 
     const expensesText = `${rows.length} expense${rows.length !== 1 ? 's' : ''}`;
 
@@ -99,7 +104,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     return (
         <>
-            <tr>
+            <tr className={expanded ? 'sfm-row-expanded' : ''}>
                 <td>
                     {renaming ? (
                         <input
@@ -114,9 +119,11 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                     {localMessage && <span className="sfm-success" style={{ display: 'block', marginTop: 4 }}>{localMessage}</span>}
                     {localError && <span className="sfm-error" style={{ display: 'block', marginTop: 4 }}>{localError}</span>}
                 </td>
-                <td className={'sfm-expenses'}>
-                    {fileSummary}
-                    <ExpandButton text={expensesText} rowExpanded={rowExpanded} setRowExpanded={setRowExpanded}/>
+                <td>
+                    <div className={'sfm-expenses'}>
+                        {totalAmount}
+                        <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>
+                    </div>
                 </td>
                 <td className={'label-text'}>{sizeLabel}</td>
                 <td className={'label-text'}>{uploadedLabel}</td>
@@ -136,10 +143,10 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                     </div>
                 </td>
             </tr>
-            {rowExpanded && (
+            {expanded && (
                 <tr>
                     <td colSpan={5}>
-                        <table className="sfm-table sfm-table-expenses">
+                        <table className="sfm-expense-table">
                             <thead>
                                 <tr>
                                     <th>Category</th>
