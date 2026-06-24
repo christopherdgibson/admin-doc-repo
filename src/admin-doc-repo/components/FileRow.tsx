@@ -20,39 +20,47 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     const [renaming, setRenaming] = useState(false);
     const [newName, setNewName] = useState(file.filename);
 
-    const [localMessage, setLocalMessage] = useState('');
-    const [localError, setLocalError] = useState('');
+    const [fileMessage, setFileMessage] = useState('');
+    const [fileError, setFileError] = useState('');
+    const [expenseMessage, setExpenseMessage] = useState('');
+    const [expenseError, setExpenseError] = useState('');
 
     useEffect(() => {
-        if (!localMessage) return;
-        const timer = setTimeout(() => setLocalMessage(''), 4000);
+        if (!fileMessage) return;
+        const timer = setTimeout(() => setFileMessage(''), 4000);
         return () => clearTimeout(timer);
-    }, [localMessage]);
+    }, [fileMessage]);
+
+    useEffect(() => {
+        if (!expenseMessage) return;
+        const timer = setTimeout(() => setExpenseMessage(''), 4000);
+        return () => clearTimeout(timer);
+    }, [expenseMessage]);
 
     function addRow() {
-        saveEdit([...rows, { category: '', submittedBy: '', date: '', amount: '' }]);
+        saveEdit([...rows, { category: '', submittedBy: '', date: '', amount: '' }], "Row successfully added.");
     }
 
     function removeRow(index: number) {
-        saveEdit(rows.filter((_, i) => i !== index));
+        saveEdit(rows.filter((_, i) => i !== index), "Row successfully deleted.");
     }
 
     function updateRow(index: number, updated: SfmMetaRow) {
-        saveEdit(rows.map((row, i) => i === index ? updated : row));
+        saveEdit(rows.map((row, i) => i === index ? updated : row), "Row successfully updated.");
     }
 
-    async function saveEdit(newRows: SfmMetaRow[]) {
+    async function saveEdit(newRows: SfmMetaRow[], successMessage: string) {
         const oldRows = rows;
         try {
             setRows(newRows);
             await api.saveMeta(file.filename, newRows);
             await onChanged();
-            setLocalMessage('Saved.');
+            setExpenseMessage(successMessage);
         } catch (e: any) {
             // Revert to old rows on api failure
             setRows(oldRows);
-            setLocalMessage('');
-            setLocalError(e.message);
+            setExpenseMessage('');
+            setExpenseError(e.message);
         }
     }
 
@@ -61,18 +69,18 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
             await api.rename(file.filename, newName);
             setRenaming(false);
             await onChanged();
-            setLocalError('');
-            setLocalMessage(`Renamed ${file.filename}.`);
+            setFileError('');
+            setFileMessage(`Renamed ${file.filename}.`);
         } catch (e: any) {
-            setLocalMessage('');
-            setLocalError(e.message);
+            setFileMessage('');
+            setFileError(e.message);
         }
     }
 
     function cancelRename() {
         setNewName(file.filename);
         setRenaming(false);
-        setLocalError('');
+        setFileError('');
     }
 
     async function handleDelete() {
@@ -83,8 +91,18 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
             setIsError(false);
             setMessage(`Deleted: ${file.filename}`);
         } catch (e: any) {
-            setLocalError(e.message);
+            setFileError(e.message);
         }
+    }
+
+    function AddExpense({}) {
+        return(
+            <button className="sfm-upload-label"
+                onClick={() => {
+                    addRow();
+                    setExpanded(true);
+                }}>+ Add Expense</button>
+        )
     }
 
     function getTotalAmount(meta: SfmMetaRow[]) {
@@ -94,7 +112,9 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     const totalAmount = getTotalAmount(rows);
 
-    const expensesText = `${rows.length} expense${rows.length !== 1 ? 's' : ''}`;
+    const expensesNumber = rows.length;
+
+    const expensesText = `${expensesNumber} expense${rows.length !== 1 ? 's' : ''}`;
 
     const sizeLabel = file.size > 1024 * 1024
         ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
@@ -106,23 +126,26 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
         <>
             <tr className={expanded ? 'sfm-row-expanded' : ''}>
                 <td>
-                    {renaming ? (
-                        <input
-                            className="sfm-rename-input"
-                            value={newName}
-                            onChange={e => setNewName(e.target.value)}
-                            autoFocus
-                        />
-                    ) : (
-                        <a href={file.url} download className="sfm-btn-link">{file.filename}</a>
-                    )}
-                    {localMessage && <span className="sfm-success" style={{ display: 'block', marginTop: 4 }}>{localMessage}</span>}
-                    {localError && <span className="sfm-error" style={{ display: 'block', marginTop: 4 }}>{localError}</span>}
+                    <div className={'file-rename-row'}>
+                        {renaming ? (
+                            <input
+                                className="sfm-rename-input"
+                                value={newName}
+                                onChange={e => setNewName(e.target.value)}
+                                autoFocus
+                            />
+                        ) : (
+                            <a href={file.url} download className="sfm-btn-link">{file.filename}</a>
+                        )}
+                        {fileMessage && <span className="sfm-success">{fileMessage}</span>}
+                        {fileError && <span className="sfm-error">{fileError}</span>}
+                    </div>
                 </td>
                 <td>
                     <div className={'sfm-expenses'}>
                         {totalAmount}
                         <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>
+                        {/* {expensesNumber === 0 ? <AddExpense /> : <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>} */}
                     </div>
                 </td>
                 <td className={'label-text'}>{sizeLabel}</td>
@@ -144,7 +167,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                 </td>
             </tr>
             {expanded && (
-                <tr>
+                <tr className={expanded ? 'sfm-expense-row-expanded' : ''}>
                     <td colSpan={5}>
                         <table className="sfm-expense-table">
                             <thead>
@@ -167,7 +190,11 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                                 ))}
                             </tbody>
                         </table>
-                        <button style={{marginTop: '10px'}} className="sfm-upload-label" onClick={addRow}>+ Add Expense</button>
+                        <div className={'expense-upload-row'}>
+                            <button className="sfm-upload-label" onClick={addRow}>+ Add Expense</button>
+                            {expenseMessage && <span className="sfm-success">{expenseMessage}</span>}
+                            {expenseError && <span className="sfm-error">{expenseError}</span>}
+                        </div>
                     </td>
                 </tr>
             )}

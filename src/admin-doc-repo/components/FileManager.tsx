@@ -33,6 +33,12 @@ export default function FileManager({api}: {api: ApiProps}) {
 
     useEffect(() => { loadFiles(); }, []);
 
+    useEffect(() => {
+        if (!message || isError) return;
+        const timer = setTimeout(() => setMessage(''), 4000);
+        return () => clearTimeout(timer);
+    }, [message]);
+
     function handleSort(col: SortKey) {
         if (sortBy === col) {
             setSortAsc(prev => !prev);
@@ -92,9 +98,7 @@ export default function FileManager({api}: {api: ApiProps}) {
     
     return (
         <div>
-            {message && <p className={isError ? "sfm-error" : "sfm-success"}>{message}</p>}
             <div className="sfm-toolbar">
-
                 <select
                     className="sfm-select"
                     value={filterCat}
@@ -184,6 +188,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                     )}
                 </div>
             </div>
+            {message && <div className={`file-upload-row ${isError ? 'sfm-error ': 'sfm-success'}`}>{message}</div>}
             {sorted.length === 0 ? (
                 <div className="sfm-empty">
                     {files.length === 0 ? 'No files uploaded yet.' : 'No files match the selected category.'}
