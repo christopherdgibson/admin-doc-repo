@@ -1,4 +1,4 @@
-interface SfmMetaRowData {
+export interface SfmMetaRowData {
     category: string;
     submittedBy: string;
     date: string;

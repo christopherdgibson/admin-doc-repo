@@ -12,8 +12,9 @@
     /* ── Derived neutrals ── */
     --header-bg: var(--neutral-base);
     --header-bg-hover: color-mix(in srgb, var(--neutral-base) 80%, black);
-    --row-bg-hover: color-mix(in srgb, var(--neutral-base) 60%, white);
+    --row-bg-hover: color-mix(in srgb, var(--neutral-base) 40%, white);
     --btn-hover-color: color-mix(in srgb, var(--neutral-base) 95%, black);
+	--input-hover-color: color-mix(in srgb, var(--neutral-base) 75%, white);
 
     --table-border-color: var(--border-base);
     --login-border-color: color-mix(in srgb, var(--border-base) 80%, white);
@@ -174,7 +175,7 @@
 	cursor: pointer;
 
 	&:hover {
-		background: var(--btn-hover-color);
+		background: var(--input-hover-color);
 	}
 }
 
@@ -230,7 +231,8 @@
 	align-items: center;
 	min-width: 110px;
 	padding: 0 6px;
-	&:hover { background: var(--btn-hover-color); }
+
+	&:hover { background: var(--input-hover-color); }
 }
 
 .sfm-expand-btn {
@@ -307,7 +309,7 @@ table.sfm-table {
 	background: white;
 
 	&:hover {
-		background: var(--btn-hover-color);
+		background: var(--input-hover-color);
 	}
 	
 }
@@ -320,7 +322,7 @@ table.sfm-table {
 	font-size: 13px;
 
 	&:hover {
-		background: var(--btn-hover-color);
+		background: var(--input-hover-color);
 	}
 }
 

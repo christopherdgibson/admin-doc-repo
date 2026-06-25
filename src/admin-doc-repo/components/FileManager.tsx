@@ -3,7 +3,7 @@ import { useState, useEffect } from '@wordpress/element';
 import FileRow from "@components/FileRow";
 import SortIcon from "@components/SortIcon";
 
-import type { ApiProps, SfmFile, SortKey } from '@block-root/types';
+import type { ApiProps, SfmFile, SfmMetaRowData, SortKey } from '@block-root/types';
 import { getSortValue } from '@block-root/types';
 
 export default function FileManager({api}: {api: ApiProps}) {
@@ -60,11 +60,13 @@ export default function FileManager({api}: {api: ApiProps}) {
         setIsError(false);
         try {
             const res = await api.upload(selectedFile);
-            //await api.saveMeta(res.filename);
+            if ([category, submittedBy, date, amount].some(v => v !== '')) {
+                const meta = [{category, submittedBy, date, amount}] as SfmMetaRowData[];
+                await api.saveMeta(res.filename, meta);
+            }
             await loadFiles();
-            setIsError(false);
+            clearStates();
             setMessage(`Uploaded: ${res.filename}`);
-            setSelectedFile(null);
         } catch (e: any) {
             setIsError(true);
             setMessage(e.message);
@@ -73,7 +75,7 @@ export default function FileManager({api}: {api: ApiProps}) {
         }
     }
 
-    function clearUpload() {
+    function clearStates() {
         setSelectedFile(null);
         setCategory('');
         setDate('');
@@ -182,7 +184,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                         </button>
                     )}
                     {selectedFile && !uploading && (
-                        <button className="sfm-btn" onClick={clearUpload}>
+                        <button className="sfm-btn" onClick={clearStates}>
                             Clear
                         </button>
                     )}

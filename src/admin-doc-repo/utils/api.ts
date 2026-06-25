@@ -1,4 +1,4 @@
-import type { SfmMetaRow } from '@block-root/types'
+import type { SfmMetaRowData } from '@block-root/types'
 
 export const api = {
     async call(endpoint: string, options: RequestInit = {}) {
@@ -42,7 +42,7 @@ export const api = {
         body: JSON.stringify({ old_filename, new_filename }),
     }),
 
-    saveMeta: (filename: string, rows: SfmMetaRow[]) => api.call('/meta', {
+    saveMeta: (filename: string, rows: SfmMetaRowData[]) => api.call('/meta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename, rows }),
