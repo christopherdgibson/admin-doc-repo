@@ -19,6 +19,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     const [expanded, setExpanded] = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [newName, setNewName] = useState(file.filename);
+    const [editIndex, setEditIndex] = useState<number | null>(null);
 
     const [fileMessage, setFileMessage] = useState('');
     const [fileError, setFileError] = useState('');
@@ -38,10 +39,12 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     }, [expenseMessage]);
 
     function addRow() {
+        setEditIndex(rows.length);
         saveEdit([...rows, { category: '', submittedBy: '', date: '', amount: '' }], "Row successfully added.");
     }
 
     function removeRow(index: number) {
+        // setEditIndex(null);
         saveEdit(rows.filter((_, i) => i !== index), "Row successfully deleted.");
     }
 
@@ -54,11 +57,13 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
         try {
             setRows(newRows);
             await api.saveMeta(file.filename, newRows);
+            setEditIndex(null);
             await onChanged();
             setExpenseMessage(successMessage);
         } catch (e: any) {
             // Revert to old rows on api failure
             setRows(oldRows);
+            setEditIndex(null);
             setExpenseMessage('');
             setExpenseError(e.message);
         }
@@ -144,8 +149,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                 <td>
                     <div className={'sfm-expenses'}>
                         {totalAmount}
-                        <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>
-                        {/* {expensesNumber === 0 ? <AddExpense /> : <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>} */}
+                        {expensesNumber === 0 ? <AddExpense /> : <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>}
                     </div>
                 </td>
                 <td className={'label-text'}>{sizeLabel}</td>
@@ -186,6 +190,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                                         row={row}
                                         onChange={updated => updateRow(i, updated)}
                                         onRemove={() => removeRow(i)}
+                                        setToEdit={i===editIndex}
                                     />
                                 ))}
                             </tbody>

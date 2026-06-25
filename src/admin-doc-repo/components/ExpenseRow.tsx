@@ -2,12 +2,13 @@ import { useState } from '@wordpress/element';
 
 import type { SfmMetaRow } from '@block-root/types'
 
-export default function ExpenseRow({ row, onChange, onRemove }: {
+export default function ExpenseRow({ row, onChange, onRemove, setToEdit = false }: {
     row: SfmMetaRow;
     onChange: (updated: SfmMetaRow) => void;
     onRemove: () => void;
+    setToEdit?: boolean;
 }) {
-    const [editing, setEditing] = useState(false);
+    const [editing, setEditing] = useState(setToEdit);
     const [newRow, setNewRow] = useState(row);
 
     function saveExpense() {
