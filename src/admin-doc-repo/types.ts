@@ -9,33 +9,36 @@ export interface SfmMetaRow extends SfmMetaRowData {
     _key: string;
 }
 
-export interface SfmFile {
-    filename: string;
-    size: number;
-    uploaded: number;
+const FILE_SORT_KEYS = ['filename', 'size', 'uploaded'] as const;
+type FileSortKey = typeof FILE_SORT_KEYS[number];
+
+export type SmfFileSortKeys = {
+    [K in FileSortKey]: K extends 'size' | 'uploaded' ? number : string;
+};
+
+export interface SfmFile extends SmfFileSortKeys {
     url: string;
     meta: SfmMetaRow[];
 }
 
-export type SortKey = 'filename' | 'size' | 'uploaded' | keyof SfmMetaRow;
+export type SortKey = FileSortKey | 'total' | keyof SfmMetaRowData;
 
-// export function getSortValue(file: SfmFile, key: SortKey) {
-//     if (key in file.meta) {
-//         return file.meta[key as keyof SfmMetaRow[]];
-//     }
-    
-//     return file[key as keyof Omit<SfmFile, 'meta'>];
-// }
+function isFileSortKey(key: SortKey): key is FileSortKey {
+    return (FILE_SORT_KEYS as readonly string[]).includes(key);
+}
 
 export function getSortValue(file: SfmFile, key: SortKey): string | number {
-    if (key === 'filename' || key === 'size' || key === 'uploaded') {
-        return file[key];
+    if (key === 'total') {
+        return file.meta.reduce((sum, row) => sum + parseFloat(row.amount || '0'), 0);
+    }
+    if (isFileSortKey(key)) {
+        return file[key] ?? '';
     }
     // For meta keys, aggregate across all rows for sorting purposes
     // e.g. sort by the first row's value, or empty string if no rows
     const firstRow = file.meta[0];
     if (!firstRow) return '';
-    return firstRow[key as keyof SfmMetaRow] ?? '';
+    return firstRow[key as keyof SfmMetaRowData] ?? '';
 }
 
 export interface ApiResponse {

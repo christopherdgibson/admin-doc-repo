@@ -199,7 +199,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                         <tr>
                             {([
                                 { col: 'filename', label: 'Filename' },
-                                { col: 'summary',  label: 'Expenses' },   // computed, consider sorting logic
+                                { col: 'total',  label: 'Expenses Total' },   // computed, consider sorting logic
                                 { col: 'size',     label: 'Size' },
                                 { col: 'uploaded', label: 'Uploaded' },
                             ] as { col: SortKey; label: string }[]).map(({ col, label }) => (

@@ -126,9 +126,9 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     const totalAmount = getTotalAmount(rows);
 
-    const expensesNumber = rows.length;
+    const expensesCount = rows.length;
 
-    const expensesText = `${expensesNumber} expense${rows.length !== 1 ? 's' : ''}`;
+    const expensesText = `${expensesCount} expense${rows.length !== 1 ? 's' : ''}`;
 
     const sizeLabel = file.size > 1024 * 1024
         ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
@@ -158,7 +158,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                 <td>
                     <div className={'sfm-expenses'}>
                         {totalAmount}
-                        {expensesNumber === 0 ? <AddExpense /> : <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>}
+                        {expensesCount === 0 ? <AddExpense /> : <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>}
                     </div>
                 </td>
                 <td className={'label-text'}>{sizeLabel}</td>
