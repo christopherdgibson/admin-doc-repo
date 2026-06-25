@@ -15,7 +15,9 @@ interface FileRowProps {
 }
 
 export default function FileRow({ api, file, onChanged, setMessage, setIsError }: FileRowProps) {
-    const [rows, setRows] = useState<SfmMetaRow[]>(file.meta);
+    const [rows, setRows] = useState<SfmMetaRow[]>(
+        file.meta.map(row => ({ ...row, _key: crypto.randomUUID() }))
+    );
     const [expanded, setExpanded] = useState(false);
     const [renaming, setRenaming] = useState(false);
     const [newName, setNewName] = useState(file.filename);
@@ -40,11 +42,17 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     function addRow() {
         setEditIndex(rows.length);
-        saveEdit([...rows, { category: '', submittedBy: '', date: '', amount: '' }], "Row successfully added.");
+        const newRow = {
+            _key: crypto.randomUUID(),
+            category: '',
+            submittedBy: '',
+            date: '',
+            amount: ''
+        };
+        saveEdit([...rows, newRow], "Row successfully added.");
     }
 
     function removeRow(index: number) {
-        // setEditIndex(null);
         saveEdit(rows.filter((_, i) => i !== index), "Row successfully deleted.");
     }
 
@@ -56,7 +64,8 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
         const oldRows = rows;
         try {
             setRows(newRows);
-            await api.saveMeta(file.filename, newRows);
+            const rowsData = newRows.map(({ _key, ...rest }) => rest);
+            await api.saveMeta(file.filename, rowsData);
             setEditIndex(null);
             await onChanged();
             setExpenseMessage(successMessage);
@@ -186,7 +195,7 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                             <tbody>
                                 {rows.map((row, i) => (
                                     <ExpenseRow
-                                        key={i}
+                                        key={row._key}
                                         row={row}
                                         onChange={updated => updateRow(i, updated)}
                                         onRemove={() => removeRow(i)}

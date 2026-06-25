@@ -1,8 +1,12 @@
-export interface SfmMetaRow {
+interface SfmMetaRowData {
     category: string;
     submittedBy: string;
     date: string;
     amount: string;
+}
+
+export interface SfmMetaRow extends SfmMetaRowData {
+    _key: string;
 }
 
 export interface SfmFile {
@@ -50,7 +54,7 @@ export interface ApiProps {
     upload: (file: File) => Promise<UploadResponse>;
     delete: (filename: string) => Promise<ApiResponse>;
     rename: (old_filename: string, new_filename: string) => Promise<ApiResponse>;
-    saveMeta: (filename: string, rows: SfmMetaRow[]) => Promise<ApiResponse>;
+    saveMeta: (filename: string, rows: SfmMetaRowData[]) => Promise<ApiResponse>;
 }
 
 export interface BlockAttributes {
