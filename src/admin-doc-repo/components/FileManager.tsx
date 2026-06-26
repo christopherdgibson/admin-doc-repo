@@ -6,9 +6,21 @@ import SortIcon from "@components/SortIcon";
 import type { ApiProps, SfmFile, SfmMetaRowData, SortKey } from '@block-root/types';
 import { getSortValue } from '@block-root/types';
 
-export default function FileManager({api}: {api: ApiProps}) {
+interface FileManagerProps {
+    api?: ApiProps;
+    categories?: string[];
+    submissions?: string[];
+    filesInput?: SfmFile[];
+}
+
+export default function FileManager({api,
+    categories = window.SFM.categories,
+    submissions = window.SFM.submissions,
+    filesInput = []
+    }: FileManagerProps
+) {
     const [sortBy, setSortBy] = useState<SortKey>('filename');
-    const [files, setFiles]       = useState<SfmFile[]>([]);
+    const [files, setFiles]       = useState<SfmFile[]>(filesInput);
     const [sortAsc, setSortAsc]   = useState<boolean>(true);
     const [filterCat, setFilter]  = useState<string>('');
     const [message, setMessage]   = useState<string>('');
@@ -22,6 +34,11 @@ export default function FileManager({api}: {api: ApiProps}) {
 
     async function loadFiles() {
         try {
+            if (api === undefined){
+                setIsError(false);
+                setMessage('In configuration mode, no file access.')
+                return;
+            }
             const data = await api.listFiles();
             setFiles(data);
             setMessage('');   // clear any stale message once data refreshes
@@ -54,6 +71,11 @@ export default function FileManager({api}: {api: ApiProps}) {
     }
 
     async function handleUpload() {
+        if (api === undefined){
+            setIsError(false);
+            setMessage('In configuration mode, no uploads.')
+            return;
+        }
         if (!selectedFile) return;
         setUploading(true);
         setMessage('');
@@ -85,6 +107,11 @@ export default function FileManager({api}: {api: ApiProps}) {
     }
 
     async function handleLogout() {
+        if (api === undefined){
+            setIsError(false);
+            setMessage('Cannot logout here in confuguration mode but the button works.')
+            return;
+        }
         await api.logout();
         window.location.reload();
     }
@@ -107,7 +134,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                     onChange={e => setFilter(e.target.value)}
                 >
                     <option value="">All categories</option>
-                    {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
+                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
 
                 <div className="sfm-toolbar-right">
@@ -138,7 +165,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                             onChange={e => setCategory(e.target.value)}
                         >
                             <option value="">— None —</option>
-                            {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
+                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </div>
                     <div className="sfm-upload-input">
@@ -149,7 +176,7 @@ export default function FileManager({api}: {api: ApiProps}) {
                             onChange={e => setSubmittedBy(e.target.value)}
                         >
                             <option value="">— None —</option>
-                            {window.SFM.submissions.map(c => <option key={c} value={c}>{c}</option>)}
+                            {submissions.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </div>
                     <div className="sfm-upload-input">
@@ -219,6 +246,8 @@ export default function FileManager({api}: {api: ApiProps}) {
                                 key={file.uploaded}
                                 api={api}
                                 file={file}
+                                submissions={submissions}
+                                categories={categories}
                                 onChanged={loadFiles}
                                 setMessage={setMessage}
                                 setIsError={setIsError}

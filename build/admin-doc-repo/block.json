@@ -29,6 +29,22 @@
         "Employee",
         "Supplier"
       ]
+    },
+    "baseColor": {
+      "type": "string",
+      "default": "#c5dfff"
+    },
+    "headerTextColor": {
+      "type": "string",
+      "default": "#555"
+    },
+    "borderColor": {
+      "type": "string",
+      "default": "#dbebff"
+    },
+    "btnPrimaryColor": {
+      "type": "string",
+      "default": "#2271b1"
     }
   },
   "supports": {

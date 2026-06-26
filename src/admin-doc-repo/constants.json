@@ -1,0 +1,34 @@
+{
+  "themePresets": {
+    "default": {
+      "baseColor": "#c5dfff",
+      "headerTextColor": "#555",
+      "borderColor": "#dbebff",
+      "btnPrimaryColor": "#2271b1"
+    },
+    "blue": {
+      "baseColor": "#1a56d6",
+      "headerTextColor": "#1a56d6",
+      "borderColor": "#e07b20",
+      "btnPrimaryColor": "#c2ddf7"
+    },
+    "forest": {
+      "baseColor": "#1a6b3c",
+      "headerTextColor": "#1a6b3c",
+      "borderColor": "#c4962a",
+      "btnPrimaryColor": "#b8dfc8"
+    },
+    "plum": {
+      "baseColor": "#5b2d8e",
+      "headerTextColor": "#5b2d8e",
+      "borderColor": "#c0392b",
+      "btnPrimaryColor": "#d4bfee"
+    },
+    "slate": {
+      "baseColor": "#2c4a6e",
+      "headerTextColor": "#2c4a6e",
+      "borderColor": "#e05c3a",
+      "btnPrimaryColor": "#b8cfe0"
+    }
+  }
+}

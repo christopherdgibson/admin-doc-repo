@@ -29,5 +29,11 @@ export default function App() {
 // Mount
 const container = document.getElementById('sfm-app');
 if (container) {
+    const colors = window.SFM.colors;
+    if (colors.baseColor)       container.style.setProperty('--base-color', colors.baseColor);
+    if (colors.headerTextColor) container.style.setProperty('--header-text-color', colors.headerTextColor);
+    if (colors.borderColor)     container.style.setProperty('--border-color', colors.borderColor);
+    if (colors.btnPrimaryColor) container.style.setProperty('--btn-primary-color', colors.btnPrimaryColor);
+
     createRoot(container).render(<App />);
 }

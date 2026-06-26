@@ -34,6 +34,22 @@ return array(
 					'Employee',
 					'Supplier'
 				)
+			),
+			'baseColor' => array(
+				'type' => 'string',
+				'default' => '#c5dfff'
+			),
+			'headerTextColor' => array(
+				'type' => 'string',
+				'default' => '#555'
+			),
+			'borderColor' => array(
+				'type' => 'string',
+				'default' => '#dbebff'
+			),
+			'btnPrimaryColor' => array(
+				'type' => 'string',
+				'default' => '#2271b1'
 			)
 		),
 		'supports' => array(

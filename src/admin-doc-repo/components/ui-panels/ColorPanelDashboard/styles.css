@@ -1,0 +1,7 @@
+.components-button-group {
+	display: flex;
+
+	.components-button {
+		flex: 1 1 auto;
+	}
+}

@@ -13,7 +13,9 @@
         "paths": {
         "@components/*": ["./src/admin-doc-repo/components/*"],
         "@admin-doc-repo/*": ["./src/admin-doc-repo/*"],
+        "@block-root": ["./src/admin-doc-repo"],
         "@block-root/types": ["./src/admin-doc-repo/types"],
+        "@block-root/constants": ["./src/admin-doc-repo/constants.json"]
         }
     },
     "include": [

@@ -2,12 +2,16 @@ import { useState } from '@wordpress/element';
 
 import type { SfmMetaRow } from '@block-root/types'
 
-export default function ExpenseRow({ row, onChange, onRemove, setToEdit = false }: {
+interface ExpenseRowProps {
     row: SfmMetaRow;
+    categories: string[],
+    submissions: string[],
     onChange: (updated: SfmMetaRow) => void;
     onRemove: () => void;
     setToEdit?: boolean;
-}) {
+}
+
+export default function ExpenseRow({ row, categories, submissions, onChange, onRemove, setToEdit = false }: ExpenseRowProps) {
     const [editing, setEditing] = useState(setToEdit);
     const [newRow, setNewRow] = useState(row);
 
@@ -32,7 +36,7 @@ export default function ExpenseRow({ row, onChange, onRemove, setToEdit = false 
                         onChange={e => setNewRow({ ...newRow, category: e.target.value })}
                     >
                         <option value="">— None —</option>
-                        {window.SFM.categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        {categories.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 ) : (
                     row.category || <span style={{ color: '#aaa' }}>—</span>
@@ -46,7 +50,7 @@ export default function ExpenseRow({ row, onChange, onRemove, setToEdit = false 
                         onChange={e => setNewRow({ ...newRow, submittedBy: e.target.value })}
                     >
                         <option value="">— None —</option>
-                        {window.SFM.submissions.map(s => <option key={s} value={s}>{s}</option>)}
+                        {submissions.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                 ) : (
                     row.submittedBy || <span style={{ color: '#aaa' }}>—</span>

@@ -7,6 +7,12 @@ wp_localize_script(
         'nonce'      => wp_create_nonce('wp_rest'),
         'categories' => $attributes['categories'] ?? ['Reports', 'Invoices', 'Contracts', 'Other'],
         'submissions' => $attributes['submissions'] ?? ['Employee', 'Admin'],
+        'colors'      => [
+            'baseColor'       => $attributes['baseColor'] ?? '',
+            'headerTextColor' => $attributes['headerTextColor'] ?? '',
+            'borderColor'     => $attributes['borderColor'] ?? '',
+            'btnPrimaryColor' => $attributes['btnPrimaryColor'] ?? '',
+        ],
     ]
 );
 ?>

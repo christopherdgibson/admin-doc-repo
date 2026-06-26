@@ -3,31 +3,31 @@
 #sfm-app, .sfm-edit-container {
 
 	/* ── Base neutrals ── */
-    // --neutral-base: #f6f7f7;
-    // --border-base: #e0e0e0;
+    // --base-color: #f6f7f7;
+    // --border-color: #e0e0e0;
 
-	--neutral-base: #c5dfff;
-	--border-base: #dbebff;
+	// --base-color: #c5dfff;
+	// --border-color: #dbebff;
 
     /* ── Derived neutrals ── */
-    --header-bg: var(--neutral-base);
-    --header-bg-hover: color-mix(in srgb, var(--neutral-base) 80%, black);
-    --row-bg-hover: color-mix(in srgb, var(--neutral-base) 40%, white);
-    --btn-hover-color: color-mix(in srgb, var(--neutral-base) 95%, black);
-	--input-hover-color: color-mix(in srgb, var(--neutral-base) 75%, white);
+    --header-bg: var(--base-color);
+    --header-bg-hover: color-mix(in srgb, var(--base-color) 80%, black);
+    --row-bg-hover: color-mix(in srgb, var(--base-color) 40%, white);
+    --btn-hover-color: color-mix(in srgb, var(--base-color) 95%, black);
+	--input-hover-color: color-mix(in srgb, var(--base-color) 75%, white);
 
-    --table-border-color: var(--border-base);
-    --login-border-color: color-mix(in srgb, var(--border-base) 80%, white);
-    --border-color: color-mix(in srgb, var(--border-base) 95%, black);
+    --table-border-color: var(--border-color);
+    --login-border-color: color-mix(in srgb, var(--border-color) 80%, white);
+    --input-border-color: color-mix(in srgb, var(--border-color) 95%, black);
 
-	--row-bg-expanded: #f0f5fb;
+	--row-bg-expanded: color-mix(in srgb, var(--base-color) 15%, white);
 
     /* ── Text ── */
     --label-text-color: #888;
-    --text-color-subtle: #555;
+    //--header-text-color: #555;
 
     /* ── Primary action ── */
-    --btn-primary-color: #2271b1;
+    //--btn-primary-color: #2271b1;
     --link-hover-color: color-mix(in srgb, var(--btn-primary-color) 80%, black);
 
     /* ── Semantic ── */
@@ -36,8 +36,8 @@
     --error-border-color: color-mix(in srgb, var(--error-text-color) 30%, white);
     --error-hover-color: color-mix(in srgb, var(--error-text-color) 5%, white);
 
-	--expense-table-header-color: #efefef;
-	--expense-table-border-color: #eee;
+	--expense-table-header-color: color-mix(in srgb, var(--base-color) 15%, white);;
+	--expense-table-border-color: var(--border-color);;
 	--expense-table-text-color: #666;
 
 	--radius: 8px;
@@ -48,13 +48,13 @@
 	// //--header-bg: #c5dfff;
 	// //--header-bg-hover: #dbebff;
 	// --row-bg-hover: #fafafa;
-	// --border-color: #ccc;
+	// --input-border-color: #ccc;
 
 	// --table-border-color: #e0e0e0;
 	// --login-border-color: #ddd;
 	// --btn-hover-color: #f0f0f0;
 	// --label-text-color: #888;
-	// --text-color-subtle: #555;
+	// --header-text-color: #555;
 
 	// --btn-primary-color: #2271b1;
 	// --link-hover-color: #135e96;
@@ -62,7 +62,9 @@
 	// --error-text-color: #c0392b;
 	// --error-border-color: #e0b0ac;
 	// --error-hover-color: #fdf2f2;
+}
 
+#sfm-app, .sfm-edit-container {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 14px;
 	color: #1e1e1e;
@@ -90,7 +92,7 @@
 .sfm-login input {
 	width: 100%;
 	padding: 8px 12px;
-	border: 1px solid var(--border-color);
+	border: 1px solid var(--input-border-color);
 	border-radius: var(--radius-sm);
 	font-size: 14px;
 	margin-bottom: 12px;
@@ -143,7 +145,7 @@
 
 .sfm-selected-filename {
     font-size: 13px;
-    color: var(--text-color-subtle);
+    color: var(--header-text-color);
 }
 
 .sfm-upload-label {
@@ -168,7 +170,7 @@
 
 .sfm-select {
 	padding: 7px 10px;
-	border: 1px solid var(--border-color);
+	border: 1px solid var(--input-border-color);
 	border-radius: var(--radius-sm);
 	font-size: 13px;
 	background: white;
@@ -181,7 +183,7 @@
 
 .sfm-btn {
 	padding: 6px 12px;
-	border: 1px solid var(--border-color);
+	border: 1px solid var(--input-border-color);
 	border-radius: var(--radius-sm);
 	background: white;
 	font-size: 13px;
@@ -220,7 +222,7 @@
 
 .sfm-expand-btn-container {
 	position: relative;
-	border: 1px solid var(--border-color);
+	border: 1px solid var(--input-border-color);
 	border-radius: var(--radius-sm);
 	background: white;
 	cursor: pointer;
@@ -266,7 +268,7 @@ table.sfm-table {
 	font-size: 12px;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: var(--text-color-subtle);
+	color: var(--header-text-color);
 	border-bottom: 1px solid var(--table-border-color);
 	white-space: nowrap;
 	user-select: none;
@@ -303,7 +305,7 @@ table.sfm-table {
 .sfm-inline-select {
 	cursor: pointer;
 	padding: 5px 8px;
-	border: 1px solid var(--border-color);
+	border: 1px solid var(--input-border-color);
 	border-radius: var(--radius-sm);
 	font-size: 13px;
 	background: white;
@@ -317,7 +319,7 @@ table.sfm-table {
 .sfm-amount-input,
 .sfm-date-input {
 	padding: 5px 8px;
-	border: 1px solid var(--border-color);
+	border: 1px solid var(--input-border-color);
 	border-radius: var(--radius-sm);
 	font-size: 13px;
 

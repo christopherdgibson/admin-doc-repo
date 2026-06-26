@@ -64,6 +64,10 @@ export interface BlockAttributes {
     align: string;
     categories: string[];
     submissions: string[];
+    baseColor: string;
+    headerTextColor: string;
+    borderColor: string;
+    btnPrimaryColor: string;
 }
 
 export interface SetAttributesProps {
@@ -82,6 +86,12 @@ export type OnClick = () => void;
 
 export type OnChange = (value: string) => void;
 
+export interface ThemeStyles extends React.CSSProperties {
+    "--base-color"?: string;
+    "--header-text-color"?: string;
+    "--border-color"?: string;
+    "--btn-primary-color"?: string;
+}
 
 // // select onChange
 // (e: React.ChangeEvent<HTMLSelectElement>)

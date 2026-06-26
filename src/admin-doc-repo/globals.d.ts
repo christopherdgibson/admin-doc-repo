@@ -5,6 +5,12 @@ declare global {
             nonce: string;
             categories: string[];
             submissions: string[];
+            colors: {
+                baseColor: string;
+                headerTextColor: string;
+                borderColor: string;
+                btnPrimaryColor: string;
+            };
         };
     }
 }

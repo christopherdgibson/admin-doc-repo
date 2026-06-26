@@ -7,14 +7,16 @@ import ExpenseRow from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
 interface FileRowProps {
-    api: ApiProps,
+    api?: ApiProps,
     file: SfmFile,
+    categories: string[],
+    submissions: string[],
     onChanged: () => Promise<void>;
     setMessage: Dispatch<SetStateAction<string>>;
     setIsError: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function FileRow({ api, file, onChanged, setMessage, setIsError }: FileRowProps) {
+export default function FileRow({ api, file, categories, submissions, onChanged, setMessage, setIsError }: FileRowProps) {
     const [rows, setRows] = useState<SfmMetaRow[]>(
         file.meta.map(row => ({ ...row, _key: crypto.randomUUID() }))
     );
@@ -61,6 +63,11 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     }
 
     async function saveEdit(newRows: SfmMetaRow[], successMessage: string) {
+        if (api === undefined){
+            setIsError(false);
+            setMessage('In configuration mode, no file access.')
+            return;
+        }
         const oldRows = rows;
         try {
             setRows(newRows);
@@ -79,6 +86,11 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
     }
 
     async function saveRename() {
+        if (api === undefined){
+            setIsError(false);
+            setMessage('In configuration mode, no file access.')
+            return;
+        }
         try {
             await api.rename(file.filename, newName);
             setRenaming(false);
@@ -99,6 +111,11 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
 
     async function handleDelete() {
         if (!confirm(`Delete ${file.filename}?`)) return;
+        if (api === undefined){
+            setIsError(false);
+            setMessage('In configuration mode, no file access.')
+            return;
+        }
         try {
             await api.delete(file.filename);
             await onChanged();
@@ -197,6 +214,8 @@ export default function FileRow({ api, file, onChanged, setMessage, setIsError }
                                     <ExpenseRow
                                         key={row._key}
                                         row={row}
+                                        categories={categories}
+                                        submissions={submissions}
                                         onChange={updated => updateRow(i, updated)}
                                         onRemove={() => removeRow(i)}
                                         setToEdit={i===editIndex}
