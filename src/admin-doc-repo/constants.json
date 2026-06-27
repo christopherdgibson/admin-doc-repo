@@ -7,26 +7,38 @@
       "btnPrimaryColor": "#2271b1"
     },
     "blue": {
-      "baseColor": "#1a56d6",
-      "headerTextColor": "#1a56d6",
-      "borderColor": "#e07b20",
-      "btnPrimaryColor": "#c2ddf7"
+      "baseColor": "#99B8FF",
+      "headerTextColor": "#fff",
+      "borderColor": "#006FFF",
+      "btnPrimaryColor": "#2271b1"
+    },
+    "orange": {
+      "baseColor": "#F0B87E",
+      "headerTextColor": "#2b2b2b",
+      "borderColor": "#B80000",
+      "btnPrimaryColor": "#2271b1"
+    },
+    "lavendar": {
+      "baseColor": "#D1AEFA",
+      "headerTextColor": "#fff",
+      "borderColor": "#DC8EFF",
+      "btnPrimaryColor": "#5A6DEE"
     },
     "forest": {
-      "baseColor": "#1a6b3c",
-      "headerTextColor": "#1a6b3c",
-      "borderColor": "#c4962a",
-      "btnPrimaryColor": "#b8dfc8"
+      "baseColor": "#99C063",
+      "headerTextColor": "#fff",
+      "borderColor": "#979D00",
+      "btnPrimaryColor": "#5D21B0"
     },
     "plum": {
       "baseColor": "#5b2d8e",
-      "headerTextColor": "#5b2d8e",
+      "headerTextColor": "#555",
       "borderColor": "#c0392b",
       "btnPrimaryColor": "#d4bfee"
     },
     "slate": {
       "baseColor": "#2c4a6e",
-      "headerTextColor": "#2c4a6e",
+      "headerTextColor": "#555",
       "borderColor": "#e05c3a",
       "btnPrimaryColor": "#b8cfe0"
     }

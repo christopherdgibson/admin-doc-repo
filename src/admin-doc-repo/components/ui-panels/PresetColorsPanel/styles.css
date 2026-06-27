@@ -1,0 +1,32 @@
+/* .components-button-group {
+	display: flex;
+
+	.components-button {
+		flex: 1 1 auto;
+	}
+} */
+
+.btn-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
+	flex-direction: row;
+	align-items: start;
+	justify-content: space-evenly;
+	margin-top: 1em;
+}
+
+.btn-theme-color {
+	border: none;
+	border-radius: 2px;
+	padding: 6px;
+	cursor: pointer;
+}
+
+.btn-theme-color:hover {
+	font-weight: 700;
+}
+
+.btn-theme-color.selected {
+    font-weight: 700;
+}
