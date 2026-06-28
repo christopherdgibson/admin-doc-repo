@@ -1,55 +1,111 @@
 === Admin Doc Repo ===
-Contributors:      The WordPress Contributors
-Tags:              block
-Tested up to:      6.8
-Stable tag:        0.1.0
-License:           GPL-2.0-or-later
-License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+Contributors: Christopher D Gibson
+Tags: documents, file manager, password protected, block, expenses
+Requires at least: 6.7
+Tested up to: 6.9
+Requires PHP: 8.0
+Stable tag: 1.0.0
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Example block scaffolded with Create Block tool.
+A password-protected document repository with expense tracking, delivered as a Gutenberg block.
 
 == Description ==
 
-This is the long description. No limit, and you can use Markdown (as well as in the following sections).
+Admin Doc Repo provides a secure, password-protected file repository embedded directly in any WordPress page via a Gutenberg block. Uploaded documents can be annotated with expense metadata — category, submitter, date, and amount — supporting multiple expense rows per document for cases where a single file contains multiple receipts.
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+**Features**
+
+* Password-protected frontend access with two configurable access levels — full (upload, rename, delete, edit) and restricted (upload and add expenses only)
+* Gutenberg block for embedding the repository on any page
+* File upload with optional expense metadata captured at upload time
+* Sortable, filterable document table
+* Per-document expense tracking with multiple rows per file
+* Inline rename and metadata editing
+* Configurable categories and submitters via the block editor sidebar
+* Customisable colours via the block editor
+* WordPress admin dashboard file manager for administrators
+* Settings page for configuring access passwords
+* Deletion history with trash panel — deleted files are moved to trash rather than permanently removed, and can be restored by full access users
+
+**Access Levels**
+
+* **WordPress administrators** — full access via the dashboard File Manager, no password required beyond WordPress login
+* **Full access users** — can upload, download, rename, delete files and edit all expense metadata
+* **Restricted access users** — can upload files and add expense rows, but cannot rename or delete
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
+1. Upload the `admin-doc-repo` folder to `/wp-content/plugins/`
+2. Activate the plugin through the **Plugins** menu in WordPress
+3. Go to **Settings → Doc Repo** and set a full access password
+4. Optionally set a restricted access password for users who should only be able to upload
+5. Edit any page and add the **Admin Doc Repo** block from the block inserter
+6. In the block sidebar, configure your categories and submitters
+7. Publish the page and share the URL with your users
 
-e.g.
+== Configuration ==
 
-1. Upload the plugin files to the `/wp-content/plugins/admin-doc-repo` directory, or install the plugin through the WordPress plugins screen directly.
-1. Activate the plugin through the 'Plugins' screen in WordPress
+**Passwords**
+Managed under **Settings → Doc Repo** in the WordPress admin. The full access password enables all operations. The restricted access password enables upload and expense entry only. Leaving the restricted password blank disables restricted access entirely.
 
+**Categories and Submitters**
+Configured in the block editor sidebar when the Admin Doc Repo block is selected. Changes are saved with the page and do not require plugin updates.
+
+**Colours**
+Configurable via the block editor sidebar. Primary colour, header text colour, border colour, and button colour can all be customised to match your theme.
+
+== File Storage ==
+
+**Uploads**
+Uploaded files are stored in `wp-content/sfm-files/`, outside the plugin directory. This means files persist across plugin updates, deactivations, and reactivations. If you delete the plugin, files in `wp-content/sfm-files/` are not automatically removed and must be deleted manually if no longer needed.
+
+**Trash**
+Deleted files are not permanently removed. Full access users can view and restore deleted files via the trash panel, which displays the original filename, deletion date, and all associated expense records at the time of deletion. Trash entries are automatically pruned if the underlying file is no longer present.
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= Where are uploaded files stored? =
+In `wp-content/sfm-files/` on your server. This directory is created automatically on plugin activation and is protected from direct directory browsing.
 
-An answer to that question.
+= What file types are allowed? =
+PDF, DOC, DOCX, XLS, XLSX, TXT, ZIP, PNG, and JPG.
 
-= What about foo bar? =
+= What happens if I forget the repository password? =
+Administrators can set a new password at any time via **Settings → Doc Repo** without needing to know the old one. If a non-admin user forgets the password, they should contact the site administrator.
 
-Answer to foo bar dilemma.
+= Can I have multiple repositories on the same site? =
+Not currently. All instances of the block share the same file storage and passwords.
+
+= Is the repository publicly accessible? =
+The repository page URL is not added to any navigation menu automatically. Files themselves are served via a direct URL once authenticated, but direct directory browsing is disabled. For sensitive documents, consider also enabling WordPress page-level password protection as an additional layer.
+
+= What is the minimum PHP version? =
+PHP 8.0 or higher is required for named arguments and match expressions used in the plugin.
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. The document repository as seen by a full access user
+2. Expense rows expanded for a single document
+3. The block editor sidebar showing category and colour configuration
+4. The Settings → Doc Repo password configuration page
+5. The WordPress admin dashboard File Manager
 
 == Changelog ==
 
-= 0.1.0 =
-* Release
+= 1.0.0 =
+* Initial release
+* Password-protected frontend block with full and restricted access levels
+* File upload, rename, delete, and download
+* Per-document expense tracking with multiple rows
+* Sortable and filterable document table
+* Configurable categories, submitters, and colours via block editor
+* WordPress admin dashboard file manager
+* Settings page for password management
+* Deletion history — files moved to trash on delete, restorable by full access users
+* Automatic pruning of orphaned trash entries on trash panel load
 
-== Arbitrary section ==
+== Upgrade Notice ==
 
-You may provide arbitrary sections, in the same format as the ones above. This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation." Arbitrary sections will be shown below the built-in sections outlined above.
+= 1.0.0 =
+Initial release.
