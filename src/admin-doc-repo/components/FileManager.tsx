@@ -272,10 +272,8 @@ export default function FileManager({api, access,
                     </tbody>
                 </table>
             )}
-            <div>access:{access}</div>
-            {/* {access === 'full' && showTrash && api !== undefined && ( */}
-            {showTrash && api !== undefined && (
-                <TrashPanel api={api} onAction={loadFiles} trashReload={trashReload} />
+            {access !== undefined && access !== null && showTrash && api !== undefined && (
+                <TrashPanel api={api} access={access} onAction={loadFiles} trashReload={trashReload} />
             )}
         </div>
     );

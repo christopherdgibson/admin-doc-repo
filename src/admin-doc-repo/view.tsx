@@ -13,9 +13,17 @@ export default function App() {
 
     useEffect(() => {
         // Check if already authenticated via existing session
-        api.listFiles()
-            .then(() => setAuthed(true))
-            .catch(() => setAuthed(false));
+        api.session()
+            .then(res => {
+                if (res.access) {
+                    setAuthed(true);
+                    setAccess(res.access);
+                }
+            })
+            .catch(() => {
+                setAuthed(false);
+                setAccess(null);
+            });
     }, []);
 
     return (

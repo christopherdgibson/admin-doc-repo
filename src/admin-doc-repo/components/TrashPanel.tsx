@@ -4,9 +4,10 @@ import type { ApiProps, SfmTrashedFile, SfmMetaRowData, AccessLevel } from '@blo
 import {ExpenseRow} from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
-function TrashedFileRow({ file, api, onAction }: {
+function TrashedFileRow({ file, api, access, onAction }: {
     file: SfmTrashedFile;
     api: ApiProps;
+    access: AccessLevel;
     onAction: () => Promise<void>;
 }) {
     const [expanded, setExpanded] = useState(false);
@@ -77,13 +78,15 @@ function TrashedFileRow({ file, api, onAction }: {
                         >
                             {restoring ? 'Restoring...' : 'Restore'}
                         </button>
-                        <button
-                            className="sfm-btn sfm-btn-danger"
-                            onClick={handlePurge}
-                            disabled={restoring || purging}
-                        >
-                            {purging ? 'Purging...' : 'Purge'}
-                        </button>
+                        {access === 'full' && (
+                            <button
+                                className="sfm-btn sfm-btn-danger"
+                                onClick={handlePurge}
+                                disabled={restoring || purging}
+                            >
+                                {purging ? 'Purging...' : 'Purge'}
+                            </button>
+                        )}
                     </div>
                 </td>
             </tr>
@@ -125,8 +128,9 @@ function TrashedFileRow({ file, api, onAction }: {
     );
 }
 
-export default function TrashPanel({ api, onAction, trashReload}: {
+export default function TrashPanel({ api, onAction, access, trashReload}: {
     api: ApiProps;
+    access: AccessLevel;
     onAction: () => Promise<void>;
     trashReload?: boolean;
 }) {
@@ -176,6 +180,7 @@ export default function TrashPanel({ api, onAction, trashReload}: {
                                 key={file.trash_filename}
                                 file={file}
                                 api={api}
+                                access={access}
                                 onAction={handleAction}
                             />
                         ))}

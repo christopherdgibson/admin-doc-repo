@@ -122,19 +122,19 @@ add_action('rest_api_init', function() {
     register_rest_route($ns, '/purge', [
         'methods'             => 'POST',
         'callback'            => 'sfm_api_purge',
-        'permission_callback' => 'sfm_api_check_auth',
+        'permission_callback' => 'sfm_api_check_full_access',
     ]);
 
     register_rest_route($ns, '/trash', [
         'methods'             => 'GET',
         'callback'            => 'sfm_api_list_trash',
-        'permission_callback' => 'sfm_api_check_full_access',
+        'permission_callback' => 'sfm_api_check_auth',
     ]);
 
     register_rest_route($ns, '/restore', [
         'methods'             => 'POST',
         'callback'            => 'sfm_api_restore',
-        'permission_callback' => 'sfm_api_check_full_access',
+        'permission_callback' => 'sfm_api_check_auth',
     ]);
 
     register_rest_route($ns, '/meta', [
