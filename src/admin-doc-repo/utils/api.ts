@@ -1,4 +1,4 @@
-import type { SfmMetaRowData } from '@block-root/types'
+import type { AccessLevel, ApiResponse, SfmFile, SfmMetaRowData, UploadResponse } from '@block-root/types'
 
 export const api = {
     async call(endpoint: string, options: RequestInit = {}) {
@@ -14,37 +14,46 @@ export const api = {
         return data;
     },
 
-    login: (password: string) => api.call('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-    }),
+    login: (password: string): Promise<{ success: boolean; access: AccessLevel }> =>
+        api.call('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+        }),
 
-    logout: () => api.call('/logout', { method: 'POST' }),
+    logout: (): Promise<ApiResponse> =>
+        api.call('/logout', { method: 'POST' }),
 
-    listFiles: () => api.call('/files'),
+    session: (): Promise<{ access: AccessLevel | null }> =>
+        api.call('/session'),
 
-    upload: (file: File) => {
+    listFiles: (): Promise<SfmFile[]> =>
+        api.call('/files'),
+
+    upload: (file: File): Promise<UploadResponse> => {
         const form = new FormData();
         form.append('sfm_file', file);
         return api.call('/upload', { method: 'POST', body: form });
     },
 
-    delete: (filename: string) => api.call('/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename }),
-    }),
+    delete: (filename: string): Promise<ApiResponse> =>
+        api.call('/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename }),
+        }),
 
-    rename: (old_filename: string, new_filename: string) => api.call('/rename', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ old_filename, new_filename }),
-    }),
+    rename: (old_filename: string, new_filename: string): Promise<ApiResponse> =>
+        api.call('/rename', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ old_filename, new_filename }),
+        }),
 
-    saveMeta: (filename: string, rows: SfmMetaRowData[]) => api.call('/meta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename, rows }),
-    }),
+    saveMeta: (filename: string, rows: SfmMetaRowData[]): Promise<ApiResponse> =>
+        api.call('/meta', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, rows }),
+        }),
 };

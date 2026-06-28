@@ -49,10 +49,13 @@ export interface UploadResponse extends ApiResponse {
     filename: string;
 }
 
+export type AccessLevel = 'full' | 'restricted';
+
 export interface ApiProps {
     call(endpoint: string, options?: RequestInit): Promise<any>;
-    login: (password: string) => Promise<ApiResponse>;
+    login: (password: string) => Promise<{ success: boolean; access: AccessLevel }>;
     logout: () => Promise<ApiResponse>;
+    session: () => Promise<{ access: AccessLevel | null }>
     listFiles: () => Promise<SfmFile[]>;
     upload: (file: File) => Promise<UploadResponse>;
     delete: (filename: string) => Promise<ApiResponse>;

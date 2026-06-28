@@ -1,12 +1,15 @@
 import { useState, useEffect } from '@wordpress/element';
 import { createRoot } from "react-dom/client";
 
+import type { AccessLevel } from './types'
+
 import FileManager from "@components/FileManager";
 import LoginForm from "@components/LoginForm";
 import {api} from "@admin-doc-repo/utils/api";
 
 export default function App() {
     const [authed, setAuthed] = useState(false);
+    const [access, setAccess]   = useState<AccessLevel| null>(null);
 
     useEffect(() => {
         // Check if already authenticated via existing session
@@ -18,9 +21,12 @@ export default function App() {
     return (
         <>
             {authed
-                ? <FileManager api={api} />
+                ? <FileManager api={api} access={access} />
                 : <LoginForm api={api}
-                    onLogin={() => setAuthed(true)} />
+                    onLogin={(access) => {
+                        setAuthed(true);
+                        setAccess(access);
+                    }} />
             }
         </>
     );

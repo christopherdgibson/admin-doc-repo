@@ -1,16 +1,16 @@
 <?php
 /**
- * Plugin Name:       Admin Doc Repo
- * Plugin URI: https://christopherdgibson.github.io/wordpress-plugins
- * Description:       Block for password-protected page document sharing.
- * Version:           0.1.0
- * Requires at least: 6.8
- * Requires PHP:      7.4
- * Author: Christopher D Gibson
- * Author URI: https://christopherdgibson.github.io
- * License:           GPL-2.0-or-later
- * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       admin-doc-repo
+ * Plugin Name:         Admin Doc Repo
+ * Plugin URI:          https://christopherdgibson.github.io/wordpress-plugins
+ * Description:         Block for password-protected page document sharing.
+ * Version:             0.1.0
+ * Requires at least:   6.8
+ * Requires PHP:        7.4
+ * Author:              Christopher D Gibson
+ * Author URI:          https://christopherdgibson.github.io
+ * License:             GPL-2.0-or-later
+ * License URI:         https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:         admin-doc-repo
  *
  * @package CreateBlock
  */
@@ -89,6 +89,12 @@ add_action('rest_api_init', function() {
         'permission_callback' => '__return_true',
     ]);
 
+    register_rest_route($ns, '/session', [
+        'methods'             => 'GET',
+        'callback'            => 'sfm_api_session',
+        'permission_callback' => '__return_true',
+    ]);
+
     register_rest_route($ns, '/files', [
         'methods'             => 'GET',
         'callback'            => 'sfm_api_list_files',
@@ -122,33 +128,53 @@ add_action('rest_api_init', function() {
 
 function sfm_api_check_auth() {
     if (!session_id()) session_start();
-    return !empty($_SESSION['sfm_authed']);
+    return !empty($_SESSION['sfm_access']);
+}
+
+function sfm_api_check_full_access() {
+    if (!session_id()) session_start();
+    return ($_SESSION['sfm_access'] ?? '') === 'full';
 }
 
 function sfm_get_password_hash() {
-    return get_option('sfm_password_hash', '');
+    return get_option('sfm_password_hash_full', '');
 }
 
 function sfm_api_login(WP_REST_Request $request) {
     if (!session_id()) session_start();
 
-    $hash = sfm_get_password_hash();
-    if (empty($hash)) {
+    $full_hash       = get_option('sfm_password_hash_full', '');
+    $restricted_hash = get_option('sfm_password_hash_restricted', '');
+
+    if (empty($full_hash)) {
         return new WP_Error('not_configured', 'No password has been set by the administrator.', ['status' => 503]);
     }
 
     $password = $request->get_param('password');
-    if (password_verify($password, $hash)) {
-        $_SESSION['sfm_authed'] = true;
-        return rest_ensure_response(['success' => true]);
+
+    if (!empty($full_hash) && password_verify($password, $full_hash)) {
+        $_SESSION['sfm_access'] = 'full';
+        return rest_ensure_response(['success' => true, 'access' => 'full']);
     }
+    if (!empty($restricted_hash) && password_verify($password, $restricted_hash)) {
+        $_SESSION['sfm_access'] = 'restricted';
+        return rest_ensure_response(['success' => true, 'access' => 'restricted']);
+    }
+
     return new WP_Error('unauthorized', 'Incorrect password', ['status' => 401]);
 }
 
 function sfm_api_logout() {
     if (!session_id()) session_start();
-    $_SESSION['sfm_authed'] = false;
+    $_SESSION['sfm_access'] = null;
+    unset($_SESSION['sfm_access']);
     return rest_ensure_response(['success' => true]);
+}
+
+function sfm_api_session() {
+    if (!session_id()) session_start();
+    $access = $_SESSION['sfm_access'] ?? null;
+    return rest_ensure_response(['access' => $access]);
 }
 
 function sfm_api_list_files() {
@@ -446,26 +472,31 @@ function sfm_render_settings_page() {
 
     $message = '';
 
-    if (isset($_POST['sfm_new_password']) && check_admin_referer('sfm_settings_save')) {
-        $new_password = $_POST['sfm_new_password'];
-        if (!empty($new_password)) {
-            update_option('sfm_password_hash', password_hash($new_password, PASSWORD_DEFAULT));
-            $message = 'Password updated.';
+    if (isset($_POST['sfm_save_settings']) && check_admin_referer('sfm_settings_save')) {
+        if (!empty($_POST['sfm_password_full'])) {
+            update_option('sfm_password_hash_full', password_hash($_POST['sfm_password_full'], PASSWORD_DEFAULT));
+            $message = 'Full access password updated.';
+        }
+        if (!empty($_POST['sfm_password_restricted'])) {
+            update_option('sfm_password_hash_restricted', password_hash($_POST['sfm_password_restricted'], PASSWORD_DEFAULT));
+            $message .= ' Restricted access password updated.';
         }
     }
 
-    $is_configured = (bool) get_option('sfm_password_hash');
+    $full_configured       = (bool) get_option('sfm_password_hash_full');
+    $restricted_configured = (bool) get_option('sfm_password_hash_restricted');
+
     ?>
     <div class="wrap">
         <h1>Admin Doc Repo Settings</h1>
 
         <?php if ($message): ?>
-            <div class="notice notice-success"><p><?= esc_html($message) ?></p></div>
+            <div class="notice notice-success"><p><?= esc_html(trim($message)) ?></p></div>
         <?php endif; ?>
 
-        <?php if (!$is_configured): ?>
+        <?php if (!$full_configured): ?>
             <div class="notice notice-warning">
-                <p>No password is set. The document repository will not allow access until you set one.</p>
+                <p>No full access password set. The repository will not allow any access until one is configured.</p>
             </div>
         <?php endif; ?>
 
@@ -473,16 +504,27 @@ function sfm_render_settings_page() {
             <?php wp_nonce_field('sfm_settings_save'); ?>
             <table class="form-table">
                 <tr>
-                    <th><label for="sfm_new_password">
-                        <?= $is_configured ? 'Change Password' : 'Set Password' ?>
+                    <th><label for="sfm_password_full">
+                        <?= $full_configured ? 'Change Full Access Password' : 'Set Full Access Password' ?>
                     </label></th>
                     <td>
-                        <input type="password" id="sfm_new_password" name="sfm_new_password" class="regular-text" autocomplete="new-password">
-                        <p class="description">Visitors will need this password to access the document repository.</p>
+                        <input type="password" id="sfm_password_full" name="sfm_password_full"
+                               class="regular-text" autocomplete="new-password">
+                        <p class="description">Full access — upload, rename, delete, edit expenses.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="sfm_password_restricted">
+                        <?= $restricted_configured ? 'Change Restricted Access Password' : 'Set Restricted Access Password (optional)' ?>
+                    </label></th>
+                    <td>
+                        <input type="password" id="sfm_password_restricted" name="sfm_password_restricted"
+                               class="regular-text" autocomplete="new-password">
+                        <p class="description">Restricted access — upload and add expenses only. Leave blank to keep unchanged.</p>
                     </td>
                 </tr>
             </table>
-            <?php submit_button($is_configured ? 'Update Password' : 'Set Password'); ?>
+            <?php submit_button('Save Passwords', 'primary', 'sfm_save_settings'); ?>
         </form>
     </div>
     <?php

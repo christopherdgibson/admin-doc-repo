@@ -3,17 +3,18 @@ import { useState, useEffect } from '@wordpress/element';
 import FileRow from "@components/FileRow";
 import SortIcon from "@components/SortIcon";
 
-import type { ApiProps, SfmFile, SfmMetaRowData, SortKey } from '@block-root/types';
+import type { AccessLevel, ApiProps, SfmFile, SfmMetaRowData, SortKey } from '@block-root/types';
 import { getSortValue } from '@block-root/types';
 
 interface FileManagerProps {
     api?: ApiProps;
+    access?: AccessLevel | null;
     categories?: string[];
     submissions?: string[];
     filesInput?: SfmFile[];
 }
 
-export default function FileManager({api,
+export default function FileManager({api, access,
     categories = window.SFM.categories,
     submissions = window.SFM.submissions,
     filesInput = []

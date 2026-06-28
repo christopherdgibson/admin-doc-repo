@@ -1,10 +1,10 @@
 import { useState } from '@wordpress/element';
 
-import type { ApiProps } from '@block-root/types';
+import type { AccessLevel, ApiProps } from '@block-root/types';
 
 interface LoginFormProps {
     api: ApiProps;
-    onLogin: () => void;
+    onLogin: (access: AccessLevel) => void;
 }
 
 export default function LoginForm({ api, onLogin }: LoginFormProps) {
@@ -17,8 +17,8 @@ export default function LoginForm({ api, onLogin }: LoginFormProps) {
         setLoading(true);
         setError('');
         try {
-            await api.login(password);
-            onLogin();
+            const res = await api.login(password);
+            onLogin(res.access);
         } catch {
             setError('Incorrect password.');
         } finally {
