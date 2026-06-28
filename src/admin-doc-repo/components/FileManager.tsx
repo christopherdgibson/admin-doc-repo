@@ -22,34 +22,21 @@ export default function FileManager({api, access,
     }: FileManagerProps
 ) {
     const [sortBy, setSortBy] = useState<SortKey>('filename');
-    const [files, setFiles]       = useState<SfmFile[]>(filesInput);
-    const [sortAsc, setSortAsc]   = useState<boolean>(true);
-    const [filterCat, setFilter]  = useState<string>('');
-    const [message, setMessage]   = useState<string>('');
-    const [isError, setIsError]   = useState<boolean>(false);
+    const [files, setFiles] = useState<SfmFile[]>(filesInput);
+    const [sortAsc, setSortAsc] = useState<boolean>(true);
+    const [filterCat, setFilter] = useState<string>('');
+    const [message, setMessage] = useState<string>('');
+    const [isError, setIsError] = useState<boolean>(false);
     const [uploading, setUploading] = useState<boolean>(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [category, setCategory] = useState('');
     const [submittedBy, setSubmittedBy] = useState('');
-    const [date, setDate]         = useState('');
+    const [date, setDate] = useState('');
     const [amount, setAmount] = useState('');
     const [showTrash, setShowTrash] = useState(false);
+    const [trashReload, setTrashReload] = useState(false);
 
-    async function loadFiles() {
-        try {
-            if (api === undefined){
-                setIsError(false);
-                setMessage('In configuration mode, no file access.')
-                return;
-            }
-            const data = await api.listFiles();
-            setFiles(data);
-            setMessage('');   // clear any stale message once data refreshes
-        } catch (e: any) {
-            setIsError(true);
-            setMessage(e.message);
-        }
-    }
+    const fileCount = files.length;
 
     useEffect(() => { loadFiles(); }, []);
 
@@ -65,6 +52,25 @@ export default function FileManager({api, access,
         } else {
             setSortBy(col);
             setSortAsc(true);
+        }
+    }
+
+    async function loadFiles() {
+        try {
+            if (api === undefined){
+                setIsError(false);
+                setMessage('In configuration mode, no file access.')
+                return;
+            }
+            const data = await api.listFiles();
+            if (showTrash && data.length < fileCount) {
+                setTrashReload(prev => !prev);
+            }
+            setFiles(data);
+            setMessage('');   // clear any stale message once data refreshes
+        } catch (e: any) {
+            setIsError(true);
+            setMessage(e.message);
         }
     }
 
@@ -120,13 +126,14 @@ export default function FileManager({api, access,
     }
 
     const sorted = [...files]
-    .filter(f => !filterCat || f.meta.some(row => row.category === filterCat))
-    .sort((a, b) => {
-        const av = getSortValue(a, sortBy);
-        const bv = getSortValue(b, sortBy);
-        const dir = sortAsc ? 1 : -1;
-        return av > bv ? dir : av < bv ? -dir : 0;
-    });
+        .filter(f => !filterCat || f.meta.some(row => row.category === filterCat))
+        .sort((a, b) => {
+            const av = getSortValue(a, sortBy);
+            const bv = getSortValue(b, sortBy);
+            const dir = sortAsc ? 1 : -1;
+            return av > bv ? dir : av < bv ? -dir : 0;
+        }
+    );
     
     return (
         <div>
@@ -229,7 +236,7 @@ export default function FileManager({api, access,
             {message && <div className={`file-upload-row ${isError ? 'sfm-error ': 'sfm-success'}`}>{message}</div>}
             {sorted.length === 0 ? (
                 <div className="sfm-empty">
-                    {files.length === 0 ? 'No files uploaded yet.' : 'No files match the selected category.'}
+                    {fileCount === 0 ? 'No files uploaded yet.' : 'No files match the selected category.'}
                 </div>
             ) : (
                 <table className="sfm-table">
@@ -237,7 +244,7 @@ export default function FileManager({api, access,
                         <tr>
                             {([
                                 { col: 'filename', label: 'Filename' },
-                                { col: 'total',  label: 'Expenses Total' },   // computed, consider sorting logic
+                                { col: 'total',  label: 'Expenses Total' },
                                 { col: 'size',     label: 'Size' },
                                 { col: 'uploaded', label: 'Uploaded' },
                             ] as { col: SortKey; label: string }[]).map(({ col, label }) => (
@@ -268,7 +275,7 @@ export default function FileManager({api, access,
             <div>access:{access}</div>
             {/* {access === 'full' && showTrash && api !== undefined && ( */}
             {showTrash && api !== undefined && (
-                <TrashPanel api={api} onAction={loadFiles} />
+                <TrashPanel api={api} onAction={loadFiles} trashReload={trashReload} />
             )}
         </div>
     );

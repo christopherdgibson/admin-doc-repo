@@ -157,7 +157,7 @@ export default function FileRow({ api, file, categories, submissions, onChanged,
         <>
             <tr className={expanded ? 'sfm-row-expanded' : ''}>
                 <td>
-                    <div className={'file-rename-row'}>
+                    <div className={'filename-row'}>
                         {renaming ? (
                             <input
                                 className="sfm-rename-input"

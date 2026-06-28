@@ -23,9 +23,9 @@ function TrashedFileRow({ file, api, onAction }: {
     const totalAmount = `€${total.toFixed(2)}`;
 
     async function handleRestore() {
+        setError('');
         if (!confirm(`Restore ${file.original_filename}?`)) return;
         setRestoring(true);
-        setError('');
         try {
             await api.restore(file.trash_filename);
             await onAction();
@@ -38,9 +38,9 @@ function TrashedFileRow({ file, api, onAction }: {
     }
 
     async function handlePurge() {
+        setError('');
         if (!confirm(`Delete ${file.original_filename}?`)) return;
         setPurging(true);
-        setError('');
         try {
             await api.purge(file.trash_filename);
             await onAction();
@@ -55,7 +55,12 @@ function TrashedFileRow({ file, api, onAction }: {
     return (
         <>
             <tr className={expanded ? 'sfm-row-expanded' : ''}>
-                <td>{file.original_filename}</td>
+                <td>
+                    <div className={'filename-row'}>
+                        {file.original_filename}
+                        {error && <div className="sfm-error">{error}</div>}
+                    </div>
+                </td>
                 <td style={{ color: 'var(--label-text-color)' }}>
                     <div className={'sfm-expenses'}>
                         {totalAmount}
@@ -80,40 +85,39 @@ function TrashedFileRow({ file, api, onAction }: {
                             {purging ? 'Purging...' : 'Purge'}
                         </button>
                     </div>
-                    {error && <div className="sfm-error">{error}</div>}
                 </td>
             </tr>
 
             {expanded && (
                 <tr className="sfm-expense-row-expanded">
-                    <td colSpan={5} >
-                            {expensesCount === 0 ? (
-                                <p style={{ color: 'var(--label-text-color)', margin: 0 }}>No expense records.</p>
-                            ) : (
-                                <table className="sfm-expense-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Category</th>
-                                            <th>Submitted By</th>
-                                            <th>Date</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {file.meta.map((row: SfmMetaRowData, i: number) => (
-                                            <ExpenseRow 
-                                                row={{ _key: i.toString(),
-                                                        category: row.category,
-                                                        submittedBy: row.submittedBy,
-                                                        date: row.date,
-                                                        amount: row.amount
-                                                    }}
-                                                editing={false}
-                                            />
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
+                    <td colSpan={5}>
+                        {expensesCount === 0 ? (
+                            <p style={{ color: 'var(--label-text-color)', margin: 0 }}>No expense records.</p>
+                        ) : (
+                            <table className="sfm-expense-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Submitted By</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {file.meta.map((row: SfmMetaRowData, i: number) => (
+                                        <ExpenseRow 
+                                            row={{ _key: i.toString(),
+                                                    category: row.category,
+                                                    submittedBy: row.submittedBy,
+                                                    date: row.date,
+                                                    amount: row.amount
+                                                }}
+                                            editing={false}
+                                        />
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
                     </td>
                 </tr>
             )}
@@ -121,15 +125,14 @@ function TrashedFileRow({ file, api, onAction }: {
     );
 }
 
-export default function TrashPanel({ api, onAction }: {
+export default function TrashPanel({ api, onAction, trashReload}: {
     api: ApiProps;
     onAction: () => Promise<void>;
+    trashReload?: boolean;
 }) {
     const [trash, setTrash]       = useState<SfmTrashedFile[]>([]);
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState('');
-
-    const trashCount = trash.length;
 
     async function loadTrash() {
         try {
@@ -142,7 +145,7 @@ export default function TrashPanel({ api, onAction }: {
         }
     }
 
-    useEffect(() => { loadTrash(); }, [trashCount]);
+    useEffect(() => { loadTrash(); }, [trashReload]);
 
     async function handleAction() {
         await onAction();  // reload main file table
@@ -155,7 +158,7 @@ export default function TrashPanel({ api, onAction }: {
     return (
         <div className="sfm-trash-panel">
             <h3 style={{ marginTop: 0 }}>Deleted Files</h3>
-            {trashCount === 0 ? (
+            {trash.length === 0 ? (
                 <div className="sfm-empty">No deleted files.</div>
             ) : (
                 <table className="sfm-table">
