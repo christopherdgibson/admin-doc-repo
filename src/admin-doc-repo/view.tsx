@@ -9,7 +9,7 @@ import {api} from "@admin-doc-repo/utils/api";
 
 export default function App() {
     const [authed, setAuthed] = useState(false);
-    const [access, setAccess]   = useState<AccessLevel| null>(null);
+    const [access, setAccess] = useState<AccessLevel| null>(null);
 
     useEffect(() => {
         // Check if already authenticated via existing session

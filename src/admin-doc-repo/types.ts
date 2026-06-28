@@ -41,15 +41,22 @@ export function getSortValue(file: SfmFile, key: SortKey): string | number {
     return firstRow[key as keyof SfmMetaRowData] ?? '';
 }
 
+export interface SfmTrashedFile {
+    original_filename: string;
+    trash_filename: string;
+    deleted_at: number;
+    meta: SfmMetaRowData[];
+}
+
+export type AccessLevel = 'full' | 'restricted';
+
 export interface ApiResponse {
     success: boolean;
 }
 
-export interface UploadResponse extends ApiResponse {
+export interface FileResponse extends ApiResponse {
     filename: string;
 }
-
-export type AccessLevel = 'full' | 'restricted';
 
 export interface ApiProps {
     call(endpoint: string, options?: RequestInit): Promise<any>;
@@ -57,9 +64,11 @@ export interface ApiProps {
     logout: () => Promise<ApiResponse>;
     session: () => Promise<{ access: AccessLevel | null }>
     listFiles: () => Promise<SfmFile[]>;
-    upload: (file: File) => Promise<UploadResponse>;
-    delete: (filename: string) => Promise<ApiResponse>;
+    upload: (file: File) => Promise<FileResponse>;
     rename: (old_filename: string, new_filename: string) => Promise<ApiResponse>;
+    delete: (filename: string) => Promise<ApiResponse>;
+    listTrash: () => Promise<SfmTrashedFile[]>;
+    restore: (trash_filename: string) => Promise<FileResponse>;
     saveMeta: (filename: string, rows: SfmMetaRowData[]) => Promise<ApiResponse>;
 }
 

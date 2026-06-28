@@ -1,8 +1,10 @@
 import { useState } from '@wordpress/element';
 
+import {Dispatch, SetStateAction} from 'react';
+
 import type { SfmMetaRow } from '@block-root/types'
 
-interface ExpenseRowProps {
+interface ExpenseRowEditProps {
     row: SfmMetaRow;
     categories: string[],
     submissions: string[],
@@ -11,16 +13,27 @@ interface ExpenseRowProps {
     setToEdit?: boolean;
 }
 
-export default function ExpenseRow({ row, categories, submissions, onChange, onRemove, setToEdit = false }: ExpenseRowProps) {
-    const [editing, setEditing] = useState(setToEdit);
+interface ExpenseRowProps {
+    row: SfmMetaRow;
+    categories?: string[],
+    submissions?: string[],
+    onChange?: (updated: SfmMetaRow) => void;
+    onRemove?: () => void;
+    editing: boolean;
+    setEditing?: Dispatch<SetStateAction<boolean>>;
+}
+
+export function ExpenseRow({ row, categories=[], submissions=[], onChange, onRemove, editing, setEditing }: ExpenseRowProps) {
     const [newRow, setNewRow] = useState(row);
 
     function saveExpense() {
+        if (onChange === undefined || setEditing === undefined) return;
         onChange(newRow);
         setEditing(false);
     }
 
     function cancelEdit() {
+        if (setEditing === undefined) return;
         setNewRow(row);
         setEditing(false);
         //setLocalError('');
@@ -82,22 +95,40 @@ export default function ExpenseRow({ row, categories, submissions, onChange, onR
                     row.amount || <span style={{ color: '#aaa' }}>—</span>
                 )}
             </td>
-            <td>
-                <div className="sfm-actions">
-                    {editing ? (
-                        <>
-                            <button className="sfm-btn sfm-btn-primary"
-                            onClick={saveExpense}>Save</button>
-                            <button className="sfm-btn" onClick={cancelEdit}>Cancel</button>
-                        </>
-                    ) : (
-                        <>
-                            <button className="sfm-btn" onClick={() => setEditing(true)}>Edit</button>
-                            <button className="sfm-btn sfm-btn-danger" onClick={onRemove}>Remove</button>
-                        </>
-                    )}
-                </div>
-            </td>
+            {setEditing !== undefined &&
+                <td>
+                    <div className="sfm-actions">
+                        {editing ? (
+                            <>
+                                <button className="sfm-btn sfm-btn-primary"
+                                onClick={saveExpense}>Save</button>
+                                <button className="sfm-btn" onClick={cancelEdit}>Cancel</button>
+                            </>
+                        ) : (
+                            <>
+                                <button className="sfm-btn" onClick={() => setEditing? setEditing(true) : null}>Edit</button>
+                                <button className="sfm-btn sfm-btn-danger" onClick={onRemove}>Remove</button>
+                            </>
+                        )}
+                    </div>
+                </td>
+            }
         </tr>
+    );
+}
+
+export function ExpenseRowEdit({ row, categories, submissions, onChange, onRemove, setToEdit = false }: ExpenseRowEditProps) {
+    const [editing, setEditing] = useState(setToEdit);
+
+    return (
+        <ExpenseRow 
+            row={row}
+            categories={categories}
+            submissions={submissions}
+            onChange={onChange}
+            onRemove={onRemove}
+            editing={editing}
+            setEditing={setEditing}
+        />
     );
 }

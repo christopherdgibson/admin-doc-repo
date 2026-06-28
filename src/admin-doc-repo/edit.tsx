@@ -2,7 +2,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 
 import type { EditProps, SfmFile, SfmMetaRow, ThemeStyles } from '@block-root/types';
 
-import OptionsPanel from '@components/OptionsPanel';
+import OptionsPanel from '@components/ui-panels/OptionsPanel';
 import FileManager from "@components/FileManager";
 import ColorPanelDashboard from "@components/ui-panels/ColorPanelDashboard";
 

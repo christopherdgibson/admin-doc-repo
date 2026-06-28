@@ -113,6 +113,18 @@ add_action('rest_api_init', function() {
         'permission_callback' => 'sfm_api_check_auth',
     ]);
 
+    register_rest_route($ns, '/trash', [
+        'methods'             => 'GET',
+        'callback'            => 'sfm_api_list_trash',
+        'permission_callback' => 'sfm_api_check_full_access',
+    ]);
+
+    register_rest_route($ns, '/restore', [
+        'methods'             => 'POST',
+        'callback'            => 'sfm_api_restore',
+        'permission_callback' => 'sfm_api_check_full_access',
+    ]);
+
     register_rest_route($ns, '/rename', [
         'methods'             => 'POST',
         'callback'            => 'sfm_api_rename',
@@ -182,14 +194,15 @@ function sfm_api_list_files() {
     $result = [];
     foreach ($files as $filepath) {
         $basename = basename($filepath);
-        if ($basename === '.htaccess' || $basename === 'meta.json') continue;
+        //if (!is_file($filepath)) continue; // consider for future robustness
+        if (in_array($basename, ['.htaccess', 'meta.json', 'trash.json', 'trash'])) continue;
         $meta = sfm_get_meta($basename);
         $result[] = [
             'filename' => $basename,
             'size'     => filesize($filepath),
             'uploaded' => filemtime($filepath),
             'url'      => SFM_UPLOAD_URL . $basename,
-            'meta'     => sfm_get_meta($basename) ?: [],  // empty array for initial upload
+            'meta'     => $meta ?: [],  // empty array for initial upload
         ];
     }
     return rest_ensure_response($result);
@@ -222,6 +235,9 @@ function sfm_api_upload(WP_REST_Request $request) {
 }
 
 function sfm_api_delete(WP_REST_Request $request) {
+    // Permanently delete files older than 30 days
+    sfm_prune_trash(30);
+    
     $filename = sanitize_file_name($request->get_param('filename'));
     $filepath = SFM_UPLOAD_DIR . $filename;
 
@@ -229,9 +245,98 @@ function sfm_api_delete(WP_REST_Request $request) {
         return new WP_Error('not_found', 'File not found', ['status' => 404]);
     }
 
-    unlink($filepath);
+    // Move to trash instead of deleting
+    $trash_dir = SFM_UPLOAD_DIR . 'trash/';
+    if (!file_exists($trash_dir)) {
+        wp_mkdir_p($trash_dir);
+        file_put_contents($trash_dir . '.htaccess', 'Options -Indexes');
+    }
+
+    $timestamp    = time();
+    $trash_name   = $timestamp . '_' . $filename;
+    $trash_path   = $trash_dir . $trash_name;
+
+    rename($filepath, $trash_path);
+
+    // Record in trash.json
+    $meta = sfm_get_meta($filename);
     sfm_delete_meta($filename);
+    sfm_record_trash($filename, $trash_name, $meta, $timestamp);
+
     return rest_ensure_response(['success' => true]);
+}
+
+function sfm_record_trash(string $filename, string $trash_name, array $meta, int $timestamp) {
+    $path    = SFM_UPLOAD_DIR . 'trash.json';
+    $history = file_exists($path) ? json_decode(file_get_contents($path), true) : [];
+
+    $history[] = [
+        'original_filename' => $filename,
+        'trash_filename'    => $trash_name,
+        'deleted_at'        => $timestamp,
+        'meta'              => $meta,
+    ];
+
+    file_put_contents($path, json_encode($history, JSON_PRETTY_PRINT));
+}
+
+function sfm_api_list_trash() {
+    $path    = SFM_UPLOAD_DIR . 'trash.json';
+    $history = file_exists($path) ? json_decode(file_get_contents($path), true) : [];
+    return rest_ensure_response(array_values($history));
+}
+
+function sfm_api_restore(WP_REST_Request $request) {
+    $trash_filename = sanitize_file_name($request->get_param('trash_filename'));
+    $trash_path     = SFM_UPLOAD_DIR . 'trash/' . $trash_filename;
+
+    if (!file_exists($trash_path)) {
+        return new WP_Error('not_found', 'Trashed file not found', ['status' => 404]);
+    }
+
+    // Read trash record to get original filename and meta
+    $path    = SFM_UPLOAD_DIR . 'trash.json';
+    $history = json_decode(file_get_contents($path), true);
+    $entry   = array_filter($history, fn($e) => $e['trash_filename'] === $trash_filename);
+    $entry   = array_values($entry)[0] ?? null;
+
+    if (!$entry) {
+        return new WP_Error('not_found', 'Trash record not found', ['status' => 404]);
+    }
+
+    $original = SFM_UPLOAD_DIR . $entry['original_filename'];
+
+    // Don't overwrite if a file with the same name now exists
+    if (file_exists($original)) {
+        return new WP_Error('name_taken', 'A file with that name already exists', ['status' => 409]);
+    }
+
+    rename($trash_path, $original);
+    sfm_save_meta($entry['original_filename'], $entry['meta']);
+
+    // Remove from trash.json
+    $history = array_filter($history, fn($e) => $e['trash_filename'] !== $trash_filename);
+    file_put_contents($path, json_encode(array_values($history), JSON_PRETTY_PRINT));
+
+    return rest_ensure_response(['success' => true, 'filename' => $entry['original_filename']]);
+}
+
+function sfm_prune_trash(int $days = 30) {
+    $path    = SFM_UPLOAD_DIR . 'trash.json';
+    $history = file_exists($path) ? json_decode(file_get_contents($path), true) : [];
+    $cutoff  = time() - ($days * 86400);
+
+    $history = array_filter($history, function($entry) use ($cutoff) {
+        if ($entry['deleted_at'] < $cutoff) {
+            // Also remove the file from trash/
+            $trash_path = SFM_UPLOAD_DIR . 'trash/' . $entry['trash_filename'];
+            if (file_exists($trash_path)) unlink($trash_path);
+            return false;
+        }
+        return true;
+    });
+
+    file_put_contents($path, json_encode(array_values($history), JSON_PRETTY_PRINT));
 }
 
 function sfm_api_rename(WP_REST_Request $request) {

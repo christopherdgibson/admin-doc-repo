@@ -1,4 +1,4 @@
-import type { AccessLevel, ApiResponse, SfmFile, SfmMetaRowData, UploadResponse } from '@block-root/types'
+import type { AccessLevel, ApiResponse, FileResponse, SfmFile, SfmMetaRowData, SfmTrashedFile } from '@block-root/types'
 
 export const api = {
     async call(endpoint: string, options: RequestInit = {}) {
@@ -30,7 +30,7 @@ export const api = {
     listFiles: (): Promise<SfmFile[]> =>
         api.call('/files'),
 
-    upload: (file: File): Promise<UploadResponse> => {
+    upload: (file: File): Promise<FileResponse> => {
         const form = new FormData();
         form.append('sfm_file', file);
         return api.call('/upload', { method: 'POST', body: form });
@@ -41,6 +41,16 @@ export const api = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ filename }),
+        }),
+
+    listTrash: (): Promise<SfmTrashedFile[]> =>
+        api.call('/trash'),
+
+    restore: (trash_filename: string): Promise<FileResponse> =>
+        api.call('/restore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trash_filename }),
         }),
 
     rename: (old_filename: string, new_filename: string): Promise<ApiResponse> =>

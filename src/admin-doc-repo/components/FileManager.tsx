@@ -1,6 +1,7 @@
 import { useState, useEffect } from '@wordpress/element';
 
 import FileRow from "@components/FileRow";
+import TrashPanel from "@components/TrashPanel";
 import SortIcon from "@components/SortIcon";
 
 import type { AccessLevel, ApiProps, SfmFile, SfmMetaRowData, SortKey } from '@block-root/types';
@@ -32,6 +33,7 @@ export default function FileManager({api, access,
     const [submittedBy, setSubmittedBy] = useState('');
     const [date, setDate]         = useState('');
     const [amount, setAmount] = useState('');
+    const [showTrash, setShowTrash] = useState(false);
 
     async function loadFiles() {
         try {
@@ -139,6 +141,12 @@ export default function FileManager({api, access,
                 </select>
 
                 <div className="sfm-toolbar-right">
+                    <button
+                        className={`sfm-btn ${showTrash ? 'sfm-btn-primary' : ''}`}
+                        onClick={() => setShowTrash(prev => !prev)}
+                    >
+                        {showTrash ? 'Hide Trash' : 'Show Trash'}
+                    </button>
                     <button className="sfm-logout" onClick={handleLogout}>Log out</button>
                 </div>
             </div>
@@ -256,6 +264,11 @@ export default function FileManager({api, access,
                         ))}
                     </tbody>
                 </table>
+            )}
+            <div>access:{access}</div>
+            {/* {access === 'full' && showTrash && api !== undefined && ( */}
+            {showTrash && api !== undefined && (
+                <TrashPanel api={api} onRestored={loadFiles} />
             )}
         </div>
     );

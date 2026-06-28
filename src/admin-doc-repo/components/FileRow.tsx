@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 
 import type { ApiProps, SfmFile, SfmMetaRow } from '@block-root/types'
 
-import ExpenseRow from '@components/ExpenseRow';
+import {ExpenseRowEdit} from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
 interface FileRowProps {
@@ -145,7 +145,7 @@ export default function FileRow({ api, file, categories, submissions, onChanged,
 
     const expensesCount = rows.length;
 
-    const expensesText = `${expensesCount} expense${rows.length !== 1 ? 's' : ''}`;
+    const expensesText = `${expensesCount} expense${expensesCount !== 1 ? 's' : ''}`;
 
     const sizeLabel = file.size > 1024 * 1024
         ? `${(file.size / 1024 / 1024).toFixed(1)} MB`
@@ -211,7 +211,7 @@ export default function FileRow({ api, file, categories, submissions, onChanged,
                             </thead>
                             <tbody>
                                 {rows.map((row, i) => (
-                                    <ExpenseRow
+                                    <ExpenseRowEdit
                                         key={row._key}
                                         row={row}
                                         categories={categories}
