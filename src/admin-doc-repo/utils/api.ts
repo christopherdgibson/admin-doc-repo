@@ -43,6 +43,13 @@ export const api = {
             body: JSON.stringify({ filename }),
         }),
 
+    purge: (trash_filename: string): Promise<ApiResponse> =>
+        api.call('/purge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trash_filename }),
+        }),
+
     listTrash: (): Promise<SfmTrashedFile[]> =>
         api.call('/trash'),
 

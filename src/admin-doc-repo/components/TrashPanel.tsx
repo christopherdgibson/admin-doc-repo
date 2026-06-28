@@ -4,13 +4,14 @@ import type { ApiProps, SfmTrashedFile, SfmMetaRowData, AccessLevel } from '@blo
 import {ExpenseRow} from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
-function TrashedFileRow({ file, api, onRestored }: {
+function TrashedFileRow({ file, api, onAction }: {
     file: SfmTrashedFile;
     api: ApiProps;
-    onRestored: () => Promise<void>;
+    onAction: () => Promise<void>;
 }) {
     const [expanded, setExpanded] = useState(false);
     const [restoring, setRestoring] = useState(false);
+    const [purging, setPurging] = useState(false);
     const [error, setError] = useState('');
 
     const deletedLabel = new Date(file.deleted_at * 1000).toLocaleDateString();
@@ -27,10 +28,27 @@ function TrashedFileRow({ file, api, onRestored }: {
         setError('');
         try {
             await api.restore(file.trash_filename);
-            await onRestored();
+            await onAction();
         } catch (e: any) {
             setError(e.message);
+        }
+        finally {
             setRestoring(false);
+        }
+    }
+
+    async function handlePurge() {
+        if (!confirm(`Delete ${file.original_filename}?`)) return;
+        setPurging(true);
+        setError('');
+        try {
+            await api.purge(file.trash_filename);
+            await onAction();
+        } catch (e: any) {
+            setError(e.message);
+        }
+        finally {
+            setPurging(false);
         }
     }
 
@@ -50,9 +68,16 @@ function TrashedFileRow({ file, api, onRestored }: {
                         <button
                             className="sfm-btn sfm-btn-primary"
                             onClick={handleRestore}
-                            disabled={restoring}
+                            disabled={restoring || purging}
                         >
                             {restoring ? 'Restoring...' : 'Restore'}
+                        </button>
+                        <button
+                            className="sfm-btn sfm-btn-danger"
+                            onClick={handlePurge}
+                            disabled={restoring || purging}
+                        >
+                            {purging ? 'Purging...' : 'Purge'}
                         </button>
                     </div>
                     {error && <div className="sfm-error">{error}</div>}
@@ -96,13 +121,15 @@ function TrashedFileRow({ file, api, onRestored }: {
     );
 }
 
-export default function TrashPanel({ api, onRestored }: {
+export default function TrashPanel({ api, onAction }: {
     api: ApiProps;
-    onRestored: () => Promise<void>;
+    onAction: () => Promise<void>;
 }) {
     const [trash, setTrash]       = useState<SfmTrashedFile[]>([]);
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState('');
+
+    const trashCount = trash.length;
 
     async function loadTrash() {
         try {
@@ -115,10 +142,10 @@ export default function TrashPanel({ api, onRestored }: {
         }
     }
 
-    useEffect(() => { loadTrash(); }, []);
+    useEffect(() => { loadTrash(); }, [trashCount]);
 
-    async function handleRestored() {
-        await onRestored();  // reload main file table
+    async function handleAction() {
+        await onAction();  // reload main file table
         await loadTrash();   // reload trash list
     }
 
@@ -128,7 +155,7 @@ export default function TrashPanel({ api, onRestored }: {
     return (
         <div className="sfm-trash-panel">
             <h3 style={{ marginTop: 0 }}>Deleted Files</h3>
-            {trash.length === 0 ? (
+            {trashCount === 0 ? (
                 <div className="sfm-empty">No deleted files.</div>
             ) : (
                 <table className="sfm-table">
@@ -146,7 +173,7 @@ export default function TrashPanel({ api, onRestored }: {
                                 key={file.trash_filename}
                                 file={file}
                                 api={api}
-                                onRestored={handleRestored}
+                                onAction={handleAction}
                             />
                         ))}
                     </tbody>

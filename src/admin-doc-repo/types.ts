@@ -67,6 +67,7 @@ export interface ApiProps {
     upload: (file: File) => Promise<FileResponse>;
     rename: (old_filename: string, new_filename: string) => Promise<ApiResponse>;
     delete: (filename: string) => Promise<ApiResponse>;
+    purge: (trash_filename: string) => Promise<ApiResponse>;
     listTrash: () => Promise<SfmTrashedFile[]>;
     restore: (trash_filename: string) => Promise<FileResponse>;
     saveMeta: (filename: string, rows: SfmMetaRowData[]) => Promise<ApiResponse>;

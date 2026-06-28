@@ -268,7 +268,7 @@ export default function FileManager({api, access,
             <div>access:{access}</div>
             {/* {access === 'full' && showTrash && api !== undefined && ( */}
             {showTrash && api !== undefined && (
-                <TrashPanel api={api} onRestored={loadFiles} />
+                <TrashPanel api={api} onAction={loadFiles} />
             )}
         </div>
     );
