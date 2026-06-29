@@ -175,7 +175,7 @@ export default function FileRow({ api, file, categories, submissions, onChanged,
                 <td>
                     <div className={'sfm-expenses'}>
                         {totalAmount}
-                        {expensesCount === 0 ? <AddExpense /> : <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>}
+                        {expensesCount === 0 ? <AddExpense /> : <ExpandButton displayText={expensesText} tooltipText={'expenses'} expanded={expanded} setExpanded={setExpanded}/>}
                     </div>
                 </td>
                 <td className={'label-text'}>{sizeLabel}</td>

@@ -319,7 +319,7 @@ table.sfm-table {
 .sfm-amount-input,
 .sfm-date-input {
 	padding: 5px 8px;
-	border: 1px solid var(--input-border-color);
+	border: 1px solid var(--input-border-color) !important;
 	border-radius: var(--radius-sm);
 	font-size: 13px;
 
@@ -461,4 +461,40 @@ table.sfm-table {
 .sfm-expand-btn-container:hover .tooltip {
 	opacity: 1;
 	pointer-events: all;
+}
+
+/* ── Edit panel ── */ 
+
+.edit-panel {
+    display: flex;
+    flex-direction: column;
+    margin: 16px 0;
+}
+
+.edit-panel-title {
+    font-size: 14px;
+    opacity: 0.6;
+    padding: 4px 0;
+    text-transform: uppercase
+}
+
+.edit-panel-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.edit-panel-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: last baseline;
+}
+
+.edit-text-input {
+    flex: 1 1 auto;
+    margin: 10px 10px 0 0;
 }

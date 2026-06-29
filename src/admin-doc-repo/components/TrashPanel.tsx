@@ -4,12 +4,22 @@ import type { ApiProps, SfmTrashedFile, SfmMetaRowData, AccessLevel } from '@blo
 import {ExpenseRow} from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
-function TrashedFileRow({ file, api, access, onAction }: {
+interface TrashedFileRowProps {
     file: SfmTrashedFile;
     api: ApiProps;
     access: AccessLevel;
     onAction: () => Promise<void>;
-}) {
+}
+
+interface TrashPanelProps {
+    api: ApiProps;
+    access: AccessLevel;
+    onAction: () => Promise<void>;
+    trashReload?: boolean;
+    trashInput?: SfmTrashedFile[];
+}
+
+function TrashedFileRow({ file, api, access, onAction }: TrashedFileRowProps) {
     const [expanded, setExpanded] = useState(false);
     const [restoring, setRestoring] = useState(false);
     const [purging, setPurging] = useState(false);
@@ -65,7 +75,7 @@ function TrashedFileRow({ file, api, access, onAction }: {
                 <td style={{ color: 'var(--label-text-color)' }}>
                     <div className={'sfm-expenses'}>
                         {totalAmount}
-                        <ExpandButton text={expensesText} expanded={expanded} setExpanded={setExpanded}/>
+                        <ExpandButton displayText={expensesText} tooltipText={'expenses'} expanded={expanded} setExpanded={setExpanded}/>
                     </div>
                 </td>
                 <td style={{ color: 'var(--label-text-color)' }}>{deletedLabel}</td>
@@ -128,13 +138,8 @@ function TrashedFileRow({ file, api, access, onAction }: {
     );
 }
 
-export default function TrashPanel({ api, onAction, access, trashReload}: {
-    api: ApiProps;
-    access: AccessLevel;
-    onAction: () => Promise<void>;
-    trashReload?: boolean;
-}) {
-    const [trash, setTrash]       = useState<SfmTrashedFile[]>([]);
+export default function TrashPanel({ api, onAction, access, trashReload, trashInput = []}: TrashPanelProps) {
+    const [trash, setTrash]       = useState<SfmTrashedFile[]>(trashInput);
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState('');
 

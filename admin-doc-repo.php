@@ -44,7 +44,7 @@ register_activation_hook(__FILE__, 'sfm_setup');
 // ── Admin Menu ───────────────────────────────────────────────
 
 function sfm_admin_menu() {
-    add_menu_page('File Manager', 'File Manager', 'read', 'sfm-files', 'sfm_render_page', 'dashicons-portfolio');
+    add_menu_page('Admin Doc Repo', 'Admin Doc Repo', 'read', 'sfm-files', 'sfm_render_page', 'dashicons-portfolio');
 }
 add_action('admin_menu', 'sfm_admin_menu');
 
@@ -578,7 +578,7 @@ function sfm_render_page() {
     $is_configured = (bool) sfm_get_password_hash();
     $settings_url  = admin_url('options-general.php?page=sfm-settings');
 
-    echo '<div class="wrap"><h1>File Manager</h1>';
+    echo '<div class="wrap"><h1>Admin Document Repository</h1>';
 
     if ($is_configured) {
         echo '<p style="color:#2271b1;">✓ Password is configured. <a href="' . esc_url($settings_url) . '">Change it</a></p>';
@@ -599,7 +599,7 @@ function sfm_render_page() {
 function sfm_settings_menu() {
     add_options_page(
         'Admin Doc Repo Settings',
-        'Doc Repo',
+        'Admin Doc Repo',
         'manage_options',
         'sfm-settings',
         'sfm_render_settings_page'

@@ -1,4 +1,3 @@
-.panel-body{--border-color:#dbebff;border-bottom:1px solid var(--border-color);border-top:1px solid var(--border-color);display:flex;flex-direction:column;padding:16px}.panel-row{align-items:last baseline;display:flex;justify-content:space-between;margin-bottom:8px}.panel-title{font-size:14px;margin-bottom:12px;opacity:.6;text-transform:uppercase}.text-input{flex:1 1 auto;margin:10px 0 0 10px}
 .components-button-group{display:flex;.components-button{flex:1 1 auto}}
 .btn-grid{align-items:start;display:grid;flex-direction:row;gap:10px;grid-template-columns:repeat(2,1fr);justify-content:space-evenly;margin-top:1em}.btn-theme-color{border:none;border-radius:2px;cursor:pointer;padding:6px}.btn-theme-color.selected,.btn-theme-color:hover{font-weight:700}
 .components-color-picker{width:100%!important;.react-colorful{width:100%!important}}

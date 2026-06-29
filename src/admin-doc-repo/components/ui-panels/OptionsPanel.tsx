@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 
 import type { ArrayKeys, BlockAttributes, SetAttributesProps } from '@block-root/types';
 
-import './styles.css';
+import ExpandButton from '@components/ExpandButton';
 
 interface OptionsPanelProps extends SetAttributesProps {
     title: string;
@@ -16,6 +16,7 @@ interface OptionsPanelProps extends SetAttributesProps {
 export default function OptionsPanel({ title, label, attributeKey, attributes, setAttributes }: OptionsPanelProps) {
     const options = attributes[attributeKey] as string[];
     const [newOption, setNewOption] = useState('');
+    const [expanded, setExpanded] = useState(false);
 
     type ArrayKeys<T> = {
         [K in keyof T]: T[K] extends any[] ? K : never;
@@ -34,22 +35,26 @@ export default function OptionsPanel({ title, label, attributeKey, attributes, s
     }
 
     return (
-        <div className={'panel-body'}>
-            <span className={'panel-title'}>{title}</span>
-            {options.map((op, i) => (
-                <div key={i} className={'panel-row'}>
-                    <span>{op}</span>
-                    <button className={'sfm-btn sfm-btn-danger'} onClick={() => removeOption(attributeKey, i)}>Remove</button>
+        <div className={'edit-panel'}>
+            <ExpandButton displayText={title} className={'edit-panel-title'} tooltipText={title} expanded={expanded} setExpanded={setExpanded}/>
+            { expanded &&
+                <div className={'edit-panel-body'}>
+                    {options.map((op, i) => (
+                        <div key={i} className={'edit-panel-row'}>
+                            <span>{op}</span>
+                            <button className={'sfm-btn sfm-btn-danger'} onClick={() => removeOption(attributeKey, i)}>Remove</button>
+                        </div>
+                    ))}
+                    <div className={'edit-panel-row'}>
+                        <TextControl className={'edit-text-input'}
+                            label={label}
+                            value={newOption}
+                            onChange={setNewOption}
+                        />
+                        <button className={'sfm-btn sfm-btn-primary'} onClick={() => addOption(attributeKey)}>Add option</button>
+                    </div>
                 </div>
-            ))}
-            <div className={'panel-row'}>
-                <TextControl className={'text-input'}
-                    label={label}
-                    value={newOption}
-                    onChange={setNewOption}
-                />
-                <button className={'sfm-btn sfm-btn-primary'} onClick={() => addOption(attributeKey)}>Add option</button>
-            </div>
+            }
         </div>
     );
 }
