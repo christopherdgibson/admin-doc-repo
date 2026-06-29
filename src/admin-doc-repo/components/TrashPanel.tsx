@@ -5,21 +5,21 @@ import {ExpenseRow} from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
 interface TrashedFileRowProps {
+    api?: ApiProps;
     file: SfmTrashedFile;
-    api: ApiProps;
     access: AccessLevel;
     onAction: () => Promise<void>;
 }
 
 interface TrashPanelProps {
-    api: ApiProps;
+    api?: ApiProps;
     access: AccessLevel;
     onAction: () => Promise<void>;
     trashReload?: boolean;
     trashInput?: SfmTrashedFile[];
 }
 
-function TrashedFileRow({ file, api, access, onAction }: TrashedFileRowProps) {
+function TrashedFileRow({ api, file, access, onAction }: TrashedFileRowProps) {
     const [expanded, setExpanded] = useState(false);
     const [restoring, setRestoring] = useState(false);
     const [purging, setPurging] = useState(false);
@@ -34,6 +34,7 @@ function TrashedFileRow({ file, api, access, onAction }: TrashedFileRowProps) {
     const totalAmount = `€${total.toFixed(2)}`;
 
     async function handleRestore() {
+        if (api === undefined) return;
         setError('');
         if (!confirm(`Restore ${file.original_filename}?`)) return;
         setRestoring(true);
@@ -49,6 +50,7 @@ function TrashedFileRow({ file, api, access, onAction }: TrashedFileRowProps) {
     }
 
     async function handlePurge() {
+        if (api === undefined) return;
         setError('');
         if (!confirm(`Delete ${file.original_filename}?`)) return;
         setPurging(true);
@@ -144,6 +146,10 @@ export default function TrashPanel({ api, onAction, access, trashReload, trashIn
     const [error, setError]       = useState('');
 
     async function loadTrash() {
+        if (api === undefined) {
+            setLoading(false);
+            return;
+        }
         try {
             const data = await api.listTrash();
             setTrash(data);

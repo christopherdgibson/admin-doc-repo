@@ -4,7 +4,7 @@ import FileRow from "@components/FileRow";
 import TrashPanel from "@components/TrashPanel";
 import SortIcon from "@components/SortIcon";
 
-import type { AccessLevel, ApiProps, SfmFile, SfmMetaRowData, SortKey } from '@block-root/types';
+import type { AccessLevel, ApiProps, SfmFile, SfmMetaRowData, SfmTrashedFile, SortKey } from '@block-root/types';
 import { getSortValue } from '@block-root/types';
 
 interface FileManagerProps {
@@ -13,12 +13,14 @@ interface FileManagerProps {
     categories?: string[];
     submissions?: string[];
     filesInput?: SfmFile[];
+    trashInput?: SfmTrashedFile[];
 }
 
 export default function FileManager({api, access,
     categories = window.SFM.categories,
     submissions = window.SFM.submissions,
-    filesInput = []
+    filesInput = [],
+    trashInput = [],
     }: FileManagerProps
 ) {
     const [sortBy, setSortBy] = useState<SortKey>('filename');
@@ -272,8 +274,8 @@ export default function FileManager({api, access,
                     </tbody>
                 </table>
             )}
-            {access !== undefined && access !== null && showTrash && api !== undefined && (
-                <TrashPanel api={api} access={access} onAction={loadFiles} trashReload={trashReload} />
+            {access !== undefined && access !== null && showTrash && (
+                <TrashPanel api={api} access={access} onAction={loadFiles} trashReload={trashReload} trashInput={trashInput} />
             )}
         </div>
     );

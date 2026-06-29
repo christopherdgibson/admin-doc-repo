@@ -3,7 +3,7 @@ import { useState } from '@wordpress/element';
 
 import ExpandButton from '@components/ExpandButton';
 
-import type { EditProps, SfmFile, SfmMetaRow, ThemeStyles } from '@block-root/types';
+import type { EditProps, SfmFile, SfmMetaRow, SfmTrashedFile, ThemeStyles } from '@block-root/types';
 
 import OptionsPanel from '@components/ui-panels/OptionsPanel';
 import FileManager from "@components/FileManager";
@@ -13,6 +13,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     const { categories, submissions, baseColor, headerTextColor, borderColor, btnPrimaryColor } = attributes;
     const blockProps = useBlockProps({ className: "sfm-edit-container" });
     const [expanded, setExpanded] = useState(false);
+
+    const currentSeconds = Date.now() / 1000;
+    const yesterdaySeconds = currentSeconds - 60 * 60 * 24;
+
 
     const sampleRow = {
         _key: crypto.randomUUID(),
@@ -25,10 +29,17 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     const sampleFile = {
         filename: 'sample-file.pdf',
         size: 0,
-        uploaded: 0,
+        uploaded: currentSeconds,
         url: '',
         meta: [sampleRow]
     } as SfmFile;
+
+    const sampleTrashedFile = {
+        original_filename: 'sample-file-trashed.pdf',
+        trash_filename: 'sample-file-trashed.pdf',
+        deleted_at: yesterdaySeconds,
+        meta: [sampleRow]
+    } as SfmTrashedFile;
 
     return (
         <>
@@ -45,10 +56,10 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             >
                 <p>Document Repository</p>
                 <div className={'edit-panel'}>
-                <ExpandButton displayText={'Document repository preview'} className={'edit-panel-title'} tooltipText={'repository'} expanded={expanded} setExpanded={setExpanded}/>
+                <ExpandButton displayText={'Document repository preview'} className={'edit-panel-title'} tooltipText={'repository'} expanded={expanded} setExpanded={setExpanded} />
                 {expanded && (
                     <div className={'edit-panel-body'}>
-                        <FileManager categories={categories} submissions={submissions} filesInput={[sampleFile]}/>
+                        <FileManager access={'full'} categories={categories} submissions={submissions} filesInput={[sampleFile]} trashInput={[sampleTrashedFile]} />
                     </div>
                 )}
                 </div>
