@@ -3,16 +3,17 @@ wp_localize_script(
     'create-block-admin-doc-repo-view-script',
     'SFM',
     [
-        'apiBase'    => rest_url('sfm/v1'),
-        'nonce'      => wp_create_nonce('wp_rest'),
-        'categories' => $attributes['categories'] ?? ['Reports', 'Invoices', 'Contracts', 'Other'],
-        'submissions' => $attributes['submissions'] ?? ['Employee', 'Admin'],
-        'colors'      => [
+        'apiBase'       => rest_url('sfm/v1'),
+        'nonce'         => wp_create_nonce('wp_rest'),
+        'categories'    => $attributes['categories'] ?? ['Reports', 'Invoices', 'Contracts', 'Other'],
+        'submissions'   => $attributes['submissions'] ?? ['Employee', 'Admin'],
+        'colors'        => [
             'baseColor'       => $attributes['baseColor'] ?? '',
             'headerTextColor' => $attributes['headerTextColor'] ?? '',
             'borderColor'     => $attributes['borderColor'] ?? '',
             'btnPrimaryColor' => $attributes['btnPrimaryColor'] ?? '',
         ],
+        'permissions'   => $attributes['permissions'] ?? []
     ]
 );
 ?>

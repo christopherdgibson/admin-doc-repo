@@ -3,8 +3,9 @@ import { useState, useEffect } from '@wordpress/element';
 import FileRow from "@components/FileRow";
 import TrashPanel from "@components/TrashPanel";
 import SortIcon from "@components/SortIcon";
+import UploadDropdown from '@components/dropdowns/UploadDropdown';
 
-import type { AccessLevel, ApiProps, SfmFile, SfmMetaRowData, SfmTrashedFile, SortKey } from '@block-root/types';
+import type { AccessLevel, ApiProps, FilePermissionProps, PermissionProps, SfmFile, SfmMetaRowData, SfmTrashedFile, SortKey, TrashPermissionProps } from '@block-root/types';
 import { getSortValue } from '@block-root/types';
 
 interface FileManagerProps {
@@ -12,6 +13,7 @@ interface FileManagerProps {
     access?: AccessLevel | null;
     categories?: string[];
     submissions?: string[];
+    permissions?: PermissionProps;
     filesInput?: SfmFile[];
     trashInput?: SfmTrashedFile[];
 }
@@ -19,6 +21,7 @@ interface FileManagerProps {
 export default function FileManager({api, access,
     categories = window.SFM.categories,
     submissions = window.SFM.submissions,
+    permissions = window.SFM.permissions,
     filesInput = [],
     trashInput = [],
     }: FileManagerProps
@@ -39,6 +42,21 @@ export default function FileManager({api, access,
     const [trashReload, setTrashReload] = useState(false);
 
     const fileCount = files.length;
+
+    function getAccess(prop: keyof PermissionProps): boolean {
+        return access == 'Full' || permissions[prop] !== "Hide";
+    }
+
+    const filePermissions: FilePermissionProps = {
+        rename: getAccess('rename'),
+        remove: getAccess('remove'),
+    }
+
+    const trashPermissions: TrashPermissionProps = {
+        trash: getAccess('trash'),
+        restore: getAccess('restore'),
+        delete: getAccess('delete')
+    }
 
     useEffect(() => { loadFiles(); }, []);
 
@@ -150,12 +168,14 @@ export default function FileManager({api, access,
                 </select>
 
                 <div className="sfm-toolbar-right">
-                    <button
-                        className={`sfm-btn ${showTrash ? 'sfm-btn-primary' : ''}`}
-                        onClick={() => setShowTrash(prev => !prev)}
-                    >
-                        {showTrash ? 'Hide Trash' : 'Show Trash'}
-                    </button>
+                    {trashPermissions.trash &&(
+                        <button
+                            className={`sfm-btn ${showTrash ? 'sfm-btn-primary' : ''}`}
+                            onClick={() => setShowTrash(prev => !prev)}
+                        >
+                            {showTrash ? 'Hide Trash' : 'Show Trash'}
+                        </button>
+                    )}
                     <button className="sfm-logout" onClick={handleLogout}>Log out</button>
                 </div>
             </div>
@@ -174,29 +194,18 @@ export default function FileManager({api, access,
                             <div className="sfm-selected-filename">{selectedFile.name}</div>
                         </div>
                     )}
-                        
-                    <div className="sfm-upload-input">
-                        <span>Category</span> 
-                        <select
-                            className="sfm-inline-select"
-                            value={category}
-                            onChange={e => setCategory(e.target.value)}
-                        >
-                            <option value="">— None —</option>
-                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                    </div>
-                    <div className="sfm-upload-input">
-                        <span>Submitted By</span> 
-                        <select
-                            className="sfm-inline-select"
-                            value={submittedBy}
-                            onChange={e => setSubmittedBy(e.target.value)}
-                        >
-                            <option value="">— None —</option>
-                            {submissions.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                    </div>
+                </div>
+                <UploadDropdown title='Category'
+                    value={category}
+                    onChange={e => setCategory(e.target.value)}
+                    options={categories}
+                />
+                <UploadDropdown title='Submitted By'
+                    value={submittedBy}
+                    onChange={e => setSubmittedBy(e.target.value)}
+                    options={submissions}
+                />
+                <div className="sfm-upload-input-group">
                     <div className="sfm-upload-input">
                         <span>Date</span> 
                         <input
@@ -206,8 +215,10 @@ export default function FileManager({api, access,
                             onChange={e => setDate(e.target.value)}
                         />
                     </div>
+                </div>
+                <div className="sfm-upload-input-group">
                     <div className="sfm-upload-input">
-                    <span>Amount</span> 
+                        <span>Amount</span> 
                         <input
                             type="number"
                             step="0.01"
@@ -266,6 +277,7 @@ export default function FileManager({api, access,
                                 file={file}
                                 submissions={submissions}
                                 categories={categories}
+                                filePermissions={filePermissions}
                                 onChanged={loadFiles}
                                 setMessage={setMessage}
                                 setIsError={setIsError}
@@ -274,8 +286,15 @@ export default function FileManager({api, access,
                     </tbody>
                 </table>
             )}
-            {access !== undefined && access !== null && showTrash && (
-                <TrashPanel api={api} access={access} onAction={loadFiles} trashReload={trashReload} trashInput={trashInput} />
+            {/* {trashPermissions.trash access !== undefined && access !== null && showTrash && ( */}
+            {trashPermissions.trash && showTrash && (
+                <TrashPanel
+                    api={api}
+                    trashPermissions={trashPermissions}
+                    onAction={loadFiles}
+                    trashReload={trashReload}
+                    trashInput={trashInput}
+                />
             )}
         </div>
     );

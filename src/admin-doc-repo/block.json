@@ -36,6 +36,16 @@
 		"btnPrimaryColor": {
 			"type": "string",
 			"default": "#2271b1"
+		},
+		"permissions": {
+			"type": "object",
+			"default": {
+				"rename": "Read / write",
+				"remove": "Read / write",
+				"trash": "Show",
+				"restore": "Read / write",
+				"delete": "Read / write"
+			}
 		}
 	},
 	"supports": {

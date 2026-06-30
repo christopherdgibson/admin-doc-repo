@@ -14,7 +14,7 @@ export default function ExpandButton({displayText, className, tooltipText, expan
     return(
         <>
             <button
-                className={'sfm-expand-btn-container'}
+                className={`sfm-expand-btn-container${expanded ? ' expanded' : ''}`}
                 onClick={() => setExpanded(prev => !prev)}
                 aria-expanded={expanded}
                 aria-label={expanded ? `Collapse${tooltipText}` : `Expand${tooltipText}`}
@@ -26,9 +26,12 @@ export default function ExpandButton({displayText, className, tooltipText, expan
                         </span>
                     </span>
                 )}
-                <span className={className ? className : 'label-text'}>{displayText}</span>
+                <span className={className ? className : 'label-text'}
+                    style={expanded ? {color: 'inherit', opacity: 'inherit'} : {}}>
+                    {displayText}
+                </span>
                 <svg className={`sfm-expand-btn${expanded ? ' sfm-expanded' : ''}`} width="24px" height="24px" viewBox="0 0 24 24" stroke-width="1.5" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
-                    <path d="M6 10L12 15L18 10" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M6 10L12 15L18 10" stroke={"inherit"} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                 </svg>
             </button>
         </>

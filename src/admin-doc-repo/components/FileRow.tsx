@@ -1,22 +1,23 @@
 import { useEffect, useState } from '@wordpress/element';
 import type { Dispatch, SetStateAction } from "react";
 
-import type { ApiProps, SfmFile, SfmMetaRow } from '@block-root/types'
+import type { ApiProps, FilePermissionProps, SfmFile, SfmMetaRow } from '@block-root/types'
 
 import {ExpenseRowEdit} from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
 interface FileRowProps {
-    api?: ApiProps,
-    file: SfmFile,
-    categories: string[],
-    submissions: string[],
+    api?: ApiProps;
+    file: SfmFile;
+    categories: string[];
+    submissions: string[];
+    filePermissions: FilePermissionProps;
     onChanged: () => Promise<void>;
     setMessage: Dispatch<SetStateAction<string>>;
     setIsError: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function FileRow({ api, file, categories, submissions, onChanged, setMessage, setIsError }: FileRowProps) {
+export default function FileRow({ api, file, categories, submissions, filePermissions, onChanged, setMessage, setIsError }: FileRowProps) {
     const [rows, setRows] = useState<SfmMetaRow[]>(
         file.meta.map(row => ({ ...row, _key: crypto.randomUUID() }))
     );
@@ -189,8 +190,12 @@ export default function FileRow({ api, file, categories, submissions, onChanged,
                             </>
                         ) : (
                             <>
-                                <button className="sfm-btn" onClick={() => setRenaming(true)}>Rename</button>
-                                <button className="sfm-btn sfm-btn-danger" onClick={handleDelete}>Delete</button>
+                                {filePermissions.rename && (
+                                    <button className="sfm-btn" onClick={() => setRenaming(true)}>Rename</button>
+                                )}
+                                {filePermissions.remove && (
+                                    <button className="sfm-btn sfm-btn-danger" onClick={handleDelete}>Delete</button>
+                                )}
                             </>
                         )}
                     </div>

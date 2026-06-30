@@ -1,25 +1,25 @@
 import { useState, useEffect } from '@wordpress/element';
-import type { ApiProps, SfmTrashedFile, SfmMetaRowData, AccessLevel } from '@block-root/types';
+import type { AccessLevel, ApiProps, SfmTrashedFile, SfmMetaRowData, TrashPermissionProps } from '@block-root/types';
 
-import {ExpenseRow} from '@components/ExpenseRow';
+import { ExpenseRow } from '@components/ExpenseRow';
 import ExpandButton from '@components/ExpandButton';
 
 interface TrashedFileRowProps {
     api?: ApiProps;
     file: SfmTrashedFile;
-    access: AccessLevel;
+    trashPermissions: TrashPermissionProps;
     onAction: () => Promise<void>;
 }
 
 interface TrashPanelProps {
     api?: ApiProps;
-    access: AccessLevel;
+    trashPermissions: TrashPermissionProps;
     onAction: () => Promise<void>;
     trashReload?: boolean;
     trashInput?: SfmTrashedFile[];
 }
 
-function TrashedFileRow({ api, file, access, onAction }: TrashedFileRowProps) {
+function TrashedFileRow({ api, file, trashPermissions, onAction }: TrashedFileRowProps) {
     const [expanded, setExpanded] = useState(false);
     const [restoring, setRestoring] = useState(false);
     const [purging, setPurging] = useState(false);
@@ -83,20 +83,23 @@ function TrashedFileRow({ api, file, access, onAction }: TrashedFileRowProps) {
                 <td style={{ color: 'var(--label-text-color)' }}>{deletedLabel}</td>
                 <td>
                     <div className="sfm-actions">
-                        <button
-                            className="sfm-btn sfm-btn-primary"
-                            onClick={handleRestore}
-                            disabled={restoring || purging}
-                        >
-                            {restoring ? 'Restoring...' : 'Restore'}
-                        </button>
-                        {access === 'full' && (
+                        {trashPermissions.restore && (
+                            <button
+                                className="sfm-btn sfm-btn-primary"
+                                onClick={handleRestore}
+                                disabled={restoring || purging}
+                            >
+                                {restoring ? 'Restoring...' : 'Restore'}
+                            </button>
+                        )}
+                        {/* {access === 'full' || permissions.delete !== "Hide" && ( */}
+                        {trashPermissions.delete && (
                             <button
                                 className="sfm-btn sfm-btn-danger"
                                 onClick={handlePurge}
                                 disabled={restoring || purging}
                             >
-                                {purging ? 'Purging...' : 'Purge'}
+                                {purging ? 'Deleting...' : 'Delete'}
                             </button>
                         )}
                     </div>
@@ -140,7 +143,7 @@ function TrashedFileRow({ api, file, access, onAction }: TrashedFileRowProps) {
     );
 }
 
-export default function TrashPanel({ api, onAction, access, trashReload, trashInput = []}: TrashPanelProps) {
+export default function TrashPanel({ api, onAction, trashPermissions, trashReload, trashInput = []}: TrashPanelProps) {
     const [trash, setTrash]       = useState<SfmTrashedFile[]>(trashInput);
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState('');
@@ -191,7 +194,7 @@ export default function TrashPanel({ api, onAction, access, trashReload, trashIn
                                 key={file.trash_filename}
                                 file={file}
                                 api={api}
-                                access={access}
+                                trashPermissions={trashPermissions}
                                 onAction={handleAction}
                             />
                         ))}

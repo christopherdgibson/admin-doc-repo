@@ -48,7 +48,7 @@ export interface SfmTrashedFile {
     meta: SfmMetaRowData[];
 }
 
-export type AccessLevel = 'full' | 'restricted';
+export type AccessLevel = 'Full' | 'Restricted';
 
 export interface ApiResponse {
     success: boolean;
@@ -73,6 +73,29 @@ export interface ApiProps {
     saveMeta: (filename: string, rows: SfmMetaRowData[]) => Promise<ApiResponse>;
 }
 
+export type VisibilitySetting = 'Show' | 'Hide';
+export type AccessSetting = 'Read / write' | 'Read only' | 'Hide';
+export type PermissionSetting = AccessSetting | VisibilitySetting;
+
+export interface PermissionProps {
+    rename: AccessSetting;
+    remove: AccessSetting;
+    trash: VisibilitySetting;
+    restore: AccessSetting;
+    delete: AccessSetting;
+}
+
+export interface FilePermissionProps {
+    rename: boolean;
+    remove: boolean;
+}
+
+export interface TrashPermissionProps {
+    trash: boolean;
+    restore: boolean;
+    delete: boolean;
+}
+
 export interface BlockAttributes {
     align: string;
     categories: string[];
@@ -81,6 +104,7 @@ export interface BlockAttributes {
     headerTextColor: string;
     borderColor: string;
     btnPrimaryColor: string;
+    permissions: PermissionProps;
 }
 
 export interface SetAttributesProps {

@@ -23,6 +23,7 @@
 	--row-bg-expanded: color-mix(in srgb, var(--base-color) 15%, white);
 
     /* ── Text ── */
+	--font-color: #1e1e1e;
     --label-text-color: #888;
     //--header-text-color: #555;
 
@@ -67,7 +68,7 @@
 #sfm-app, .sfm-edit-container {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 14px;
-	color: #1e1e1e;
+	color: var(--font-color);
 	max-width: 1200px;
 	margin: 0 auto;
 	padding: 24px;
@@ -119,6 +120,7 @@
 .sfm-upload-group {
     display: flex;
 	margin-bottom: 20px;
+	gap: 16px;
 }
 
 .sfm-upload-input-group {
@@ -145,7 +147,7 @@
 
 .sfm-selected-filename {
     font-size: 13px;
-    color: var(--header-text-color);
+    color: var(--font-color);
 }
 
 .sfm-upload-label {
@@ -233,8 +235,24 @@
 	align-items: center;
 	min-width: 110px;
 	padding: 0 6px;
+	font-weight: 400;
+	stroke: #000000;
+	stroke-opacity: 0.6; 
 
 	&:hover { background: var(--input-hover-color); }
+}
+
+.sfm-expand-btn-container.expanded {
+	opacity: 1;
+	stroke-opacity: 1; 
+	color: var(--header-text-color);
+	stroke: var(--header-text-color);
+	background: var(--header-bg);
+}
+
+.sfm-expand-btn-container:hover .tooltip {
+	opacity: 1;
+	pointer-events: all;
 }
 
 .sfm-expand-btn {
@@ -456,11 +474,6 @@ table.sfm-table {
 	border-radius: var(--radius-sm);
 	padding: 8px 12px;
 	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.sfm-expand-btn-container:hover .tooltip {
-	opacity: 1;
-	pointer-events: all;
 }
 
 /* ── Edit panel ── */ 

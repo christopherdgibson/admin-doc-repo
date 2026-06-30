@@ -50,6 +50,16 @@ return array(
 			'btnPrimaryColor' => array(
 				'type' => 'string',
 				'default' => '#2271b1'
+			),
+			'permissions' => array(
+				'type' => 'object',
+				'default' => array(
+					'rename' => 'Read / write',
+					'remove' => 'Read / write',
+					'trash' => 'Show',
+					'restore' => 'Read / write',
+					'delete' => 'Read / write'
+				)
 			)
 		),
 		'supports' => array(

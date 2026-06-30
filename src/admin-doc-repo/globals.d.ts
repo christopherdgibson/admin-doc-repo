@@ -1,3 +1,5 @@
+import type { AccessSetting, VisibilitySetting } from '@block-root/types';
+
 declare global {
     interface Window {
         SFM: {
@@ -11,6 +13,13 @@ declare global {
                 borderColor: string;
                 btnPrimaryColor: string;
             };
+            permissions: {
+                rename: AccessSetting;
+                remove: AccessSetting;
+                trash: VisibilitySetting;
+                restore: AccessSetting;
+                delete: AccessSetting;
+            }
         };
     }
 }
