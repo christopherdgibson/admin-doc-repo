@@ -93,7 +93,7 @@ function TrashedFileRow({ api, file, trashPermissions, onAction }: TrashedFileRo
                             </button>
                         )}
                         {/* {access === 'full' || permissions.delete !== "Hide" && ( */}
-                        {trashPermissions.delete && (
+                        {trashPermissions.purge && (
                             <button
                                 className="sfm-btn sfm-btn-danger"
                                 onClick={handlePurge}

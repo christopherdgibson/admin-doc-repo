@@ -193,7 +193,7 @@ export default function FileRow({ api, file, categories, submissions, filePermis
                                 {filePermissions.rename && (
                                     <button className="sfm-btn" onClick={() => setRenaming(true)}>Rename</button>
                                 )}
-                                {filePermissions.remove && (
+                                {filePermissions.delete && (
                                     <button className="sfm-btn sfm-btn-danger" onClick={handleDelete}>Delete</button>
                                 )}
                             </>

@@ -110,37 +110,43 @@ add_action('rest_api_init', function() {
     register_rest_route($ns, '/rename', [
         'methods'             => 'POST',
         'callback'            => 'sfm_api_rename',
-        'permission_callback' => 'sfm_api_check_auth',
+        'permission_callback' => sfm_require_access('sfm_perm_rename'),
     ]);
 
     register_rest_route($ns, '/delete', [
         'methods'             => 'POST',
         'callback'            => 'sfm_api_delete',
-        'permission_callback' => 'sfm_api_check_auth',
-    ]);
-
-    register_rest_route($ns, '/purge', [
-        'methods'             => 'POST',
-        'callback'            => 'sfm_api_purge',
-        'permission_callback' => 'sfm_api_check_full_access',
+        'permission_callback' => sfm_require_access('sfm_perm_delete'),
     ]);
 
     register_rest_route($ns, '/trash', [
         'methods'             => 'GET',
         'callback'            => 'sfm_api_list_trash',
-        'permission_callback' => 'sfm_api_check_auth',
+        'permission_callback' => sfm_require_access('sfm_perm_trash'),
     ]);
 
     register_rest_route($ns, '/restore', [
         'methods'             => 'POST',
         'callback'            => 'sfm_api_restore',
-        'permission_callback' => 'sfm_api_check_auth',
+        'permission_callback' => sfm_require_access('sfm_perm_restore'),
+    ]);
+
+    register_rest_route($ns, '/purge', [
+        'methods'             => 'POST',
+        'callback'            => 'sfm_api_purge',
+        'permission_callback' => sfm_require_access('sfm_perm_purge'),
     ]);
 
     register_rest_route($ns, '/meta', [
         'methods'             => 'POST',
         'callback'            => 'sfm_api_save_meta',
         'permission_callback' => 'sfm_api_check_auth',
+    ]);
+
+    register_rest_route($ns, '/permissions', [
+        'methods'             => 'POST',
+        'callback'            => 'sfm_api_save_permissions',
+        'permission_callback' => function() { return current_user_can('manage_options'); },
     ]);
 });
 
@@ -151,7 +157,34 @@ function sfm_api_check_auth() {
 
 function sfm_api_check_full_access() {
     if (!session_id()) session_start();
-    return ($_SESSION['sfm_access'] ?? '') === 'full';
+    return ($_SESSION['sfm_access'] ?? '') === 'Full';
+}
+
+function sfm_require_access(string $option_key) {
+    return function() use ($option_key) {
+        if (!session_id()) session_start();
+        $access  = $_SESSION['sfm_access'] ?? '';
+        $setting = get_option($option_key, 'Show'); // default Show = any access
+
+        if ($setting === 'Hide') {
+            return $access === 'Full';
+        }
+        return in_array($access, ['Full', 'Restricted']);
+    };
+}
+
+function sfm_api_save_permissions(WP_REST_Request $request) {
+    $allowed = ['Show', 'Hide'];
+    $perms   = $request->get_param('permissions') ?? [];
+
+    $keys = ['rename', 'delete', 'trash', 'restore', 'purge'];
+    foreach ($keys as $key) {
+        if (isset($perms[$key]) && in_array($perms[$key], $allowed)) {
+            update_option("sfm_perm_{$key}", $perms[$key]);
+        }
+    }
+
+    return rest_ensure_response(['success' => true]);
 }
 
 function sfm_get_password_hash() {
@@ -171,12 +204,12 @@ function sfm_api_login(WP_REST_Request $request) {
     $password = $request->get_param('password');
 
     if (!empty($full_hash) && password_verify($password, $full_hash)) {
-        $_SESSION['sfm_access'] = 'full';
-        return rest_ensure_response(['success' => true, 'access' => 'full']);
+        $_SESSION['sfm_access'] = 'Full';
+        return rest_ensure_response(['success' => true, 'access' => 'Full']);
     }
     if (!empty($restricted_hash) && password_verify($password, $restricted_hash)) {
-        $_SESSION['sfm_access'] = 'restricted';
-        return rest_ensure_response(['success' => true, 'access' => 'restricted']);
+        $_SESSION['sfm_access'] = 'Restricted';
+        return rest_ensure_response(['success' => true, 'access' => 'Restricted']);
     }
 
     return new WP_Error('unauthorized', 'Incorrect password', ['status' => 401]);

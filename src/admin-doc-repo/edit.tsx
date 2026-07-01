@@ -1,5 +1,5 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 import ExpandButton from '@components/ExpandButton';
 
@@ -9,6 +9,7 @@ import OptionsPanel from '@components/ui-panels/OptionsPanel';
 import FileManager from "@components/FileManager";
 import ColorPanelDashboard from "@components/ui-panels/ColorPanelDashboard";
 import UploadDropdown from '@components/dropdowns/UploadDropdown';
+import { editorApi } from "@admin-doc-repo/utils/editorApi";
 
 export default function Edit({ attributes, setAttributes }: EditProps) {
     const { categories, submissions, baseColor, headerTextColor, borderColor, btnPrimaryColor } = attributes;
@@ -25,7 +26,11 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
     const currentSeconds = Date.now() / 1000;
     const yesterdaySeconds = currentSeconds - 60 * 60 * 24;
 
-    // useEffect(() => { setPermissions(attributes.permissions); }, []);
+    useEffect(() => {
+        if (!permissions) return;
+        editorApi.savePermissions(permissions);
+    }, []);
+
     const sampleRow = {
         _key: crypto.randomUUID(),
         category: '',
@@ -57,6 +62,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
         const newPermissions =  {...permissions, [key]: value};
         setPermissions(newPermissions);
         setAttributes({permissions: newPermissions});
+        editorApi.savePermissions(newPermissions);
     }
 
     return (
@@ -116,14 +122,14 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                             <div className="sfm-upload-group">
                                 <UploadDropdown title='Rename'
                                     value={permissions.rename}
-                                    onChange={e => updatePermissions('rename', e.target.value as AccessSetting)}
-                                    options={readWrite}
+                                    onChange={e => updatePermissions('rename', e.target.value as VisibilitySetting)}
+                                    options={showHide}
                                     emptyOption={false}
                                 />
                                 <UploadDropdown title='Remove'
-                                    value={permissions.remove}
-                                    onChange={e => updatePermissions('remove', e.target.value as AccessSetting)}
-                                    options={readWrite}
+                                    value={permissions.delete}
+                                    onChange={e => updatePermissions('delete', e.target.value as VisibilitySetting)}
+                                    options={showHide}
                                     emptyOption={false}
                                 />
                                 <UploadDropdown title='Trash'
@@ -134,15 +140,15 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
                                 />
                                 <UploadDropdown title='Restore'
                                     value={permissions.restore}
-                                    onChange={e => updatePermissions('restore', e.target.value as AccessSetting)}
-                                    options={readWrite}
+                                    onChange={e => updatePermissions('restore', e.target.value as VisibilitySetting)}
+                                    options={showHide}
                                     emptyOption={false}
                                     disabled={permissions.trash === 'Hide'}
                                 />
                                 <UploadDropdown title='Delete permanently'
-                                    value={permissions.delete}
-                                    onChange={e => updatePermissions('delete', e.target.value as AccessSetting)}
-                                    options={readWrite}
+                                    value={permissions.purge}
+                                    onChange={e => updatePermissions('purge', e.target.value as VisibilitySetting)}
+                                    options={showHide}
                                     emptyOption={false}
                                     disabled={permissions.trash === 'Hide'}
                                 />

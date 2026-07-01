@@ -7,6 +7,7 @@ import UploadDropdown from '@components/dropdowns/UploadDropdown';
 
 import type { AccessLevel, ApiProps, FilePermissionProps, PermissionProps, SfmFile, SfmMetaRowData, SfmTrashedFile, SortKey, TrashPermissionProps } from '@block-root/types';
 import { getSortValue } from '@block-root/types';
+import ExpandButton from './ExpandButton';
 
 interface FileManagerProps {
     api?: ApiProps;
@@ -49,13 +50,13 @@ export default function FileManager({api, access,
 
     const filePermissions: FilePermissionProps = {
         rename: getAccess('rename'),
-        remove: getAccess('remove'),
+        delete: getAccess('delete'),
     }
 
     const trashPermissions: TrashPermissionProps = {
         trash: getAccess('trash'),
         restore: getAccess('restore'),
-        delete: getAccess('delete')
+        purge: getAccess('purge')
     }
 
     useEffect(() => { loadFiles(); }, []);
@@ -157,6 +158,12 @@ export default function FileManager({api, access,
     
     return (
         <div>
+            {/* <div>access: {access}</div>
+            <div>permissions.rename: {permissions.rename}</div>
+            <div>permissions.delete: {permissions.delete}</div>
+            <div>permissions.trash: {permissions.trash}</div>
+            <div>permissions.restore: {permissions.restore}</div>
+            <div>permissions.purge: {permissions.purge}</div> */}
             <div className="sfm-toolbar">
                 <select
                     className="sfm-select"
@@ -167,16 +174,17 @@ export default function FileManager({api, access,
                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
 
-                <div className="sfm-toolbar-right">
-                    {trashPermissions.trash &&(
-                        <button
-                            className={`sfm-btn ${showTrash ? 'sfm-btn-primary' : ''}`}
-                            onClick={() => setShowTrash(prev => !prev)}
-                        >
-                            {showTrash ? 'Hide Trash' : 'Show Trash'}
-                        </button>
-                    )}
+                <div className="sfm-toolbar-right sfm-flex-column">
                     <button className="sfm-logout" onClick={handleLogout}>Log out</button>
+                    {trashPermissions.trash && (
+                        <ExpandButton
+                            displayText={showTrash ? 'Hide Trash' : 'Show Trash'}
+                            tooltipText={'trash'}
+                            expanded={showTrash}
+                            setExpanded={setShowTrash}
+                        />
+                    )}
+                    
                 </div>
             </div>
             <div className="sfm-upload-group">

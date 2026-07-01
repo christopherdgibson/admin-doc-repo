@@ -14,11 +14,11 @@ declare global {
                 btnPrimaryColor: string;
             };
             permissions: {
-                rename: AccessSetting;
-                remove: AccessSetting;
+                rename: VisibilitySetting;
+                delete: VisibilitySetting;
                 trash: VisibilitySetting;
-                restore: AccessSetting;
-                delete: AccessSetting;
+                restore: VisibilitySetting;
+                purge: VisibilitySetting;
             }
         };
     }

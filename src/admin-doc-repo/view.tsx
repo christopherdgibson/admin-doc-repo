@@ -5,7 +5,7 @@ import type { AccessLevel } from './types'
 
 import FileManager from "@components/FileManager";
 import LoginForm from "@components/LoginForm";
-import {api} from "@admin-doc-repo/utils/api";
+import { api } from "@admin-doc-repo/utils/api";
 
 export default function App() {
     const [authed, setAuthed] = useState(false);

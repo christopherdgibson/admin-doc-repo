@@ -40,11 +40,11 @@
 		"permissions": {
 			"type": "object",
 			"default": {
-				"rename": "Read / write",
-				"remove": "Read / write",
+				"rename": "Show",
+				"delete": "Show",
 				"trash": "Show",
-				"restore": "Read / write",
-				"delete": "Read / write"
+				"restore": "Show",
+				"purge": "Show"
 			}
 		}
 	},

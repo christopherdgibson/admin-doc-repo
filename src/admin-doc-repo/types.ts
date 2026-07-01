@@ -73,27 +73,31 @@ export interface ApiProps {
     saveMeta: (filename: string, rows: SfmMetaRowData[]) => Promise<ApiResponse>;
 }
 
+export interface EditorApiProps {
+    savePermissions: (permissions: PermissionProps) => Promise<ApiResponse>;
+}
+
 export type VisibilitySetting = 'Show' | 'Hide';
 export type AccessSetting = 'Read / write' | 'Read only' | 'Hide';
 export type PermissionSetting = AccessSetting | VisibilitySetting;
 
 export interface PermissionProps {
-    rename: AccessSetting;
-    remove: AccessSetting;
+    rename: VisibilitySetting;
+    delete: VisibilitySetting;
     trash: VisibilitySetting;
-    restore: AccessSetting;
-    delete: AccessSetting;
+    restore: VisibilitySetting;
+    purge: VisibilitySetting;
 }
 
 export interface FilePermissionProps {
     rename: boolean;
-    remove: boolean;
+    delete: boolean;
 }
 
 export interface TrashPermissionProps {
     trash: boolean;
     restore: boolean;
-    delete: boolean;
+    purge: boolean;
 }
 
 export interface BlockAttributes {

@@ -54,11 +54,11 @@ return array(
 			'permissions' => array(
 				'type' => 'object',
 				'default' => array(
-					'rename' => 'Read / write',
-					'remove' => 'Read / write',
+					'rename' => 'Show',
+					'delete' => 'Show',
 					'trash' => 'Show',
-					'restore' => 'Read / write',
-					'delete' => 'Read / write'
+					'restore' => 'Show',
+					'purge' => 'Show'
 				)
 			)
 		),

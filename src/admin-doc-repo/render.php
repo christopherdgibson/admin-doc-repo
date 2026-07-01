@@ -13,7 +13,14 @@ wp_localize_script(
             'borderColor'     => $attributes['borderColor'] ?? '',
             'btnPrimaryColor' => $attributes['btnPrimaryColor'] ?? '',
         ],
-        'permissions'   => $attributes['permissions'] ?? []
+        'permissions' => [
+            'rename' => get_option('sfm_perm_rename', 'Show'),
+            'delete'  => get_option('sfm_perm_delete', 'Show'),
+            'trash'  => get_option('sfm_perm_trash', 'Show'),
+            'restore'  => get_option('sfm_perm_restore', 'Show'),
+            'purge' => get_option('sfm_perm_purge', 'Show'),
+
+        ],
     ]
 );
 ?>

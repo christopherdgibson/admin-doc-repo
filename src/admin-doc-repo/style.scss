@@ -104,7 +104,7 @@
 
 .sfm-toolbar {
 	display: flex;
-	align-items: center;
+	align-items: end;
 	gap: 12px;
 	margin-bottom: 20px;
 	flex-wrap: wrap;
@@ -113,8 +113,12 @@
 .sfm-toolbar-right {
 	margin-left: auto;
 	display: flex;
-	align-items: center;
+	align-items: end;
 	gap: 12px;
+}
+
+.sfm-flex-column {
+	flex-direction: column;
 }
 
 .sfm-upload-group {
@@ -379,9 +383,11 @@ table.sfm-table {
 	background: none;
 	border: none;
 	text-decoration: underline;
-}
 
-.sfm-logout:hover { color: #333; }
+	&:hover {
+		color: var(--error-text-color)
+	}
+}
 
 .sfm-uploading {
 	font-size: 13px;

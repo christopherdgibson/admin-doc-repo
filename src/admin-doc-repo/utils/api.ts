@@ -1,6 +1,6 @@
-import type { AccessLevel, ApiResponse, FileResponse, SfmFile, SfmMetaRowData, SfmTrashedFile } from '@block-root/types'
+import type { AccessLevel, ApiProps, ApiResponse, FileResponse, SfmFile, SfmMetaRowData, SfmTrashedFile } from '@block-root/types'
 
-export const api = {
+export const api: ApiProps = {
     async call(endpoint: string, options: RequestInit = {}) {
         const res = await fetch(`${window.SFM.apiBase}${endpoint}`, {
             ...options,
